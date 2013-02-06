@@ -1,25 +1,25 @@
-sub convertTagFromElex($)
+sub convertTag($)
 {
 	($elexTag) = @_;
 
 	if ( $elexTag =~ m/^N\((.*?)\)/g )
 	{
-		return convertNounTagFromElex($1);
+		return convertNounTag($1);
 	}
 	elsif ( $elexTag =~ m/^WW\((.*?)\)/g )
 	{
-		return convertVerbTagFromElex($1);
+		return convertVerbTag($1);
 	}
 	elsif ( $elexTag =~ m/^ADJ\((.*?)\)/g )
 	{
-		return convertAdjectiveTagFromElex($1);
+		return convertAdjectiveTag($1);
 	}
-	
-	#print STDERR "$elexTag is not supported (currently only N, V, and Adjv are supported)\n";
+
+#print STDERR "$elexTag is not supported (currently only N, V, and Adjv are supported)\n";
 	return 0;
 }
 
-sub convertAdjectiveTagFromElex($)
+sub convertAdjectiveTag($)
 {
 	($subtag) = @_;
 
@@ -27,7 +27,7 @@ sub convertAdjectiveTagFromElex($)
 	my $conj;
 
 	# postnom, prenom, and vrij|dim are not included
-	if ( $subtag eq "prenom,basis,met-e,bijz" ) 
+	if ( $subtag eq "prenom,basis,met-e,bijz" )
 	{
 		$conj   = "e";
 		$degree = "pos";
@@ -114,10 +114,10 @@ sub convertAdjectiveTagFromElex($)
 		$conj   = "norm";
 		$degree = "comp";
 	}
-	elsif ( $subtag eq "nom,sup,met-e,mv-n" ) 
-	{ 
-		$conj = "e"; 
-		$degree = "sup"; 
+	elsif ( $subtag eq "nom,sup,met-e,mv-n" )
+	{
+		$conj   = "e";
+		$degree = "sup";
 	}
 	elsif ( $subtag eq "nom,sup,met-e,zonder-n,stan" )
 	{
@@ -129,18 +129,20 @@ sub convertAdjectiveTagFromElex($)
 		$conj   = "norm";
 		$degree = "sup";
 	}
-	elsif ( $subtag eq "vrij,basis,zonder" ) {
+	elsif ( $subtag eq "vrij,basis,zonder" )
+	{
 		$conj   = "norm";
 		$degree = "pos";
 	}
-	elsif ( $subtag eq "vrij,comp,zonder" ) {
+	elsif ( $subtag eq "vrij,comp,zonder" )
+	{
 		$conj   = "norm";
 		$degree = "comp";
 	}
-	elsif ( $subtag eq "vrij,sup,zonder" ) 
-	{ 
-		$conj = "norm"; 
-		$degree = "sup"; 
+	elsif ( $subtag eq "vrij,sup,zonder" )
+	{
+		$conj   = "norm";
+		$degree = "sup";
 	}
 
 	if ( $degree && $conj )
@@ -148,11 +150,11 @@ sub convertAdjectiveTagFromElex($)
 		return "Adjv(deg=$degree,form=$conj)";
 	}
 
-	#print STDERR "No conversion for Adjv($subtag)\n";
+	print STDERR "No conversion for Adjv($subtag)\n";
 	return 0;
 }
 
-sub convertNounTagFromElex($)
+sub convertNounTag($)
 {
 	($subtag) = @_;
 
@@ -179,11 +181,11 @@ sub convertNounTagFromElex($)
 		return "N(dim=$dim,num=$num,case=$case)";
 	}
 
-	#print STDERR "No conversion for N($subtag)\n";
+	print STDERR "No conversion for N($subtag)\n";
 	return 0;
 }
 
-sub convertVerbTagFromElex($)
+sub convertVerbTag($)
 {
 	($subtag) = @_;
 
@@ -326,7 +328,7 @@ sub convertVerbTagFromElex($)
 		}
 	}
 
-	#print STDERR "No conversion for V($subtag)\n";
+	print STDERR "No conversion for V($subtag)\n";
 	return 0;
 }
 
