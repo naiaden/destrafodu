@@ -150,7 +150,7 @@ sub convertAdjectiveTag($)
 		return "Adjv(deg=$degree,form=$conj)";
 	}
 
-	print STDERR "No conversion for Adjv($subtag)\n";
+	#print STDERR "No conversion for Adjv($subtag)\n";
 	return 0;
 }
 
@@ -181,7 +181,7 @@ sub convertNounTag($)
 		return "N(dim=$dim,num=$num,case=$case)";
 	}
 
-	print STDERR "No conversion for N($subtag)\n";
+	#print STDERR "No conversion for N($subtag)\n";
 	return 0;
 }
 
@@ -328,7 +328,7 @@ sub convertVerbTag($)
 		}
 	}
 
-	print STDERR "No conversion for V($subtag)\n";
+	#print STDERR "No conversion for V($subtag)\n";
 	return 0;
 }
 

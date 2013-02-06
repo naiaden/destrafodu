@@ -1,11 +1,62 @@
+use Acme::Comment type => 'C++';
 use HTML::Entities;
+use File::Find::Rule ;
 
 our $lassyTagRegex = qr/^\s*<node.*?lemma=\"(.*?)\".*?postag=\"(.*?)\".*?word=\"(.*?)\".*?\/>$/;
 our $elexTagRegex = qr/<pos>([^<]+)<\/pos>/;
 
-sub extractLassyXMLFile
+sub extractLassyXMLDirectory($)
 {
+	my $path = shift;
 	
+	my $ffr_obj = File::Find::Rule->file()
+                                  ->name( "*.xml" )
+                                  ->start ( $path );
+
+	my @tlfCombinations;
+
+    while (my $file = $ffr_obj->match() )
+    {
+       @tlfCombinations = extractLassyXMLFileAdditive($file, \@tlfCombinations);
+    }
+    
+    return @tlfCombinations;
+}
+
+sub extractLassyXMLFileAdditive($$)
+{
+	my $lassyXMLFile = shift;
+	my $tlfCombinationsRef = shift;
+	my @tlfCombinations = @$tlfCombinationsRef;
+	
+	open IF, "$lassyXMLFile" or die "Cannot open lassy input file $lassyXMLFile!\n";
+	
+	my $lemma;
+	my $form;
+	my $tag;
+	
+	while(<IF>)
+	{
+		my $result = 0;
+		($result, $tag, $lemma, $form) = extractLassyXMLLine($_);
+		
+		if($result ne 0)
+		{
+			push(@tlfCombinations, ($tag, $lemma, $form));
+		}
+			
+	}
+	
+	close IF;
+	
+	return @tlfCombinations;
+}
+
+sub extractLassyXMLFile($)
+{
+	my $lassyXMLFile = shift;
+	my @tlfCombinations;
+	return extractLassyXMLFileAdditive($lassyXMLFile, \@tlfCombinations);
 }
 
 # returns a 4-tuple. If the first value is a zero, no valid TLF triple was found in the line.

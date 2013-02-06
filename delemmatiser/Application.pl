@@ -124,8 +124,17 @@ sub process_filess($$) {
 #readFile("/home/louis/p1/delemmatiser/data/corpora/elex1.1/lexdata/elex-1.1.xml", \&convertTag);
 #readFile("/home/louis/p1/delemmatiser/data/corpora/elex1.1/lexdata/elex-1.1.xml", \&extractElexXML);
 
-my @lijstje = extractElexXMLFile("/tmp/elex");
+#my @lijstje = extractElexXMLFile("/tmp/elex");
 #my @lijstje = extractElexXMLFile("/home/louis/p1/delemmatiser/data/corpora/elex1.1/lexdata/elex-1.1.xml");
+#my @lijstje = extractLassyXMLFile("/home/louis/p1/delemmatiser/data/corpora/Lassy1.0/Treebank/dpc-kam-001286-nl-sen/dpc-kam-001286-nl-sen.p.6.s.1.xml");
+/*
+foreach(@lijstje)
+{
+	print "$_\n";
+}
+*/
+
+my @lijstje = extractLassyXMLDirectory("/home/louis/p1/delemmatiser/data/corpora/Lassy1.0/Treebank/");
 foreach(@lijstje)
 {
 	print "$_\n";
