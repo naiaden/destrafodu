@@ -23,7 +23,7 @@ sub applyWeighting($$)
 		{
 			applyScheme1(\@tlffCombinations);
 		}
-		case
+		case 2
 		{
 			applyScheme2(\@tlffCombinations);
 		} 
@@ -33,3 +33,5 @@ sub applyWeighting($$)
 		}
 	}
 }
+
+1;
