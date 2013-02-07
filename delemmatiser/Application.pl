@@ -24,6 +24,8 @@ require 'WeightingScheme.pl';
 # 	-L <dir>   		Lassy XML directory							implemented
 #	-t <file>		Load persistent Elex file					implemented
 #	-T <file>		Load persistent Lassy file					implemented
+#
+#	-w <n>			Weighting scheme, n = {1,2,3}				
 
 
 #if( ! getopts('gl:p:' ) )
@@ -61,6 +63,9 @@ if( $opt_g )
 		@trainData = readTrainLexicon($opt_t, \@trainData);
 		
 		print "Number of entries read: ".(($#trainData+1)/4)."\n";
+		
+		@trainTypeData = applyWeighting(2, \@trainData);
+		print "Number of entries read: ".(($#trainTypeData+1)/5)."\n";
 		
 	}
 	
