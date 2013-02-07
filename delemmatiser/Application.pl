@@ -56,9 +56,23 @@ my @trainData = extractElexXMLFile("/tmp/elex");
 my @testData = extractLassyXMLDirectory("/home/louis/p1/delemmatiser/data/corpora/Lassy1.0/Treebank/dpc-kam-001286-nl-sen/");
 
 
+
 if( $opt_p )
 {
 	print "Making data persistent...";
 	writeTrainLexicon("$opt_p/trainData", \@trainData);
 	writeTestLexicon("$opt_p/testData", \@testData);
 }
+
+my @empty;
+readTrainLexicon("/tmp/trainData", \@empty);
+
+my @newTestData;
+@newTestData = readTestLexicon("/tmp/testData", \@newTestData);
+writeTestLexicon("/tmp/testData_new", \@newTestData);
+
+
+
+
+
+
