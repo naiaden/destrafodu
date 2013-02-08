@@ -127,6 +127,69 @@ sub writeTrainLexicon($$)
 	close OF;
 }
 
+sub writeWeightedTrainLexicon($$)
+{
+	my $lexiconFile = shift;
+	my $tlffmCombinationsRef = shift;
+	my @tlffmCombinations = @$tlffmCombinationsRef;
+	
+	open OF, ">$lexiconFile" or die "Cannot open weighted train lexicon output file $lexiconFile!\n";
+	
+	binmode OF, ":utf8";
+	
+	print OF "# This is an automatically generated lexicon file\n";
+	print OF "# For information, requests, or bug reports, mail louis\@naiaden.nl\n";
+	print OF "# Generated on ".localtime()." by destrafodu: Delemmatisation strategies for Dutch\n";
+	print OF "# \n";
+	print OF "# The structure is as follows:\n";
+	print OF "# tag lemma form frequency mass\n";
+	print OF "# Fields are seperated by whitespace\n";
+
+	my ($tag, $lemma, $form, $frequency, $mass);
+	
+	my $i = 1;
+	foreach(@tlffmCombinations)
+	{
+		my $line = $_;
+		
+		switch ($i)
+		{
+			case 1
+			{
+				$tag = $line;
+			}
+			case 2
+			{
+				$lemma = $line;
+			}
+			case 3
+			{
+				$form = $line;
+			} 
+			case 4
+			{
+				$frequency= $line;
+			}  
+			case 5
+			{
+				$mass = $line;
+				
+				print OF "$tag $lemma $form $frequency $mass\n";
+				
+				$i = 0;
+			}
+			else
+			{
+				print STDERR "Unknown iterator in writeWeightedTrainLexicon: $i";
+			}
+		}
+		
+		$i++;
+	}
+	
+	close OF;
+}
+
 sub writeTestLexicon($$)
 {
 	my $lexiconFile = shift;

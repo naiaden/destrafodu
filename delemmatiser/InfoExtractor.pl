@@ -17,6 +17,7 @@ sub extractLassyXMLDirectory($)
 
     while (my $file = $ffr_obj->match() )
     {
+    	print "Processing $file\n";
        @tlfCombinations = extractLassyXMLFileAdditive($file, \@tlfCombinations);
     }
     
@@ -79,6 +80,45 @@ sub extractLassyXMLLine($)
 	}
 	
 	return (0, "", "", "");
+}
+
+sub extractLassyCountFile ($)
+{
+	my $lassyCountFile = shift;
+	
+	my @tlfCombinations;
+	
+	open IF, "$lassyCountFile" or die "Cannot open lassy count input file $lassyCountFile!\n";
+	
+	my $lemma;
+	my $form;
+	my $tag;
+	
+	while(<IF>)
+	{
+		my $line = $_;
+		
+		if($line =~ m/\s+(\d+) ([^ ]+) ([^ ]+) ([^ ]+)$/g)
+		{
+			my $frequency = $1;
+			$lemma = $2;
+			$form = $3;
+			$tag = $4;
+			
+			my $convertedTag = convertTag($tag);
+			if($convertedTag)
+			{
+				for(1 .. $frequency)
+				{
+					push(@tlfCombinations, ($convertedTag, $lemma, $form));
+				}
+			}
+			
+			
+		} 
+	}
+	
+	return @tlfCombinations;
 }
 
 sub extractElexXMLFile ($)

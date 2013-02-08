@@ -141,7 +141,7 @@ sub applyWeighting($$)
 		}
 	
 		push(@tlffmCombinations, ($tag, $lemma, $form, $frequency, $tlfRelMass));
-	
+		#print("$tag, $lemma, $form, $frequency, $tlfRelMass\n");
 	}
 	
 	return @tlffmCombinations;
