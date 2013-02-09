@@ -82,6 +82,41 @@ sub extractLassyXMLLine($)
 	return (0, "", "", "");
 }
 
+sub extractLassyCountFileStdIn ()
+{
+	my @tlfCombinations;
+	
+	my $lemma;
+	my $form;
+	my $tag;
+	
+	while(<>)
+	{
+		my $line = $_;
+		
+		if($line =~ m/\s+(\d+) ([^ ]+) ([^ ]+) ([^ ]+)$/g)
+		{
+			my $frequency = $1;
+			$lemma = $2;
+			$form = $3;
+			$tag = $4;
+			
+			my $convertedTag = convertTag($tag);
+			if($convertedTag)
+			{
+				for(1 .. $frequency)
+				{
+					push(@tlfCombinations, ($convertedTag, $lemma, $form));
+				}
+			}
+			
+			
+		} 
+	}
+	
+	return @tlfCombinations;
+}
+
 sub extractLassyCountFile ($)
 {
 	my $lassyCountFile = shift;
@@ -118,6 +153,8 @@ sub extractLassyCountFile ($)
 		} 
 	}
 	
+	close IF;
+	
 	return @tlfCombinations;
 }
 
@@ -127,15 +164,27 @@ sub extractElexXMLFile ($)
 	
 	my @tlffCombinations;
 	
-	open IF, '<:encoding(latin1)', "$elexXMLFile" or die "Cannot open elex input file $elexXMLFile!\n";
-	
 	my $lemma;
 	my $form;
 	my $freq;
 	my $tag;
 	
+	my $i = 0;
+	
+	open IF, '<:encoding(latin1)', "$elexXMLFile" or die "Cannot open elex input file $elexXMLFile!\n";
+	
 	while(<IF>)
 	{
+		if($i++ % 100 == 0)
+		{
+			#print "$i ";
+			
+			if($i % 5000 == 0)
+			{
+				#print "\n";
+			}
+		}
+		
 		my $line = $_;
 		
 		if($line =~ m/<lem>([^,]+)(,.*?)?<\/lem>/g)
@@ -160,6 +209,55 @@ sub extractElexXMLFile ($)
 	}
 	
 	close IF;
+	
+	return @tlffCombinations;
+}
+
+sub extractElexXMLFileStdIn ()
+{
+	my @tlffCombinations;
+	
+	my $lemma;
+	my $form;
+	my $freq;
+	my $tag;
+	
+	my $i = 0;
+	
+	while(<>)
+	{
+		if($i++ % 100 == 0)
+		{
+			#print "$i ";
+			
+			if($i % 5000 == 0)
+			{
+				#print "\n";
+			}
+		}
+		
+		my $line = $_;
+		
+		if($line =~ m/<lem>([^,]+)(,.*?)?<\/lem>/g)
+		{
+			$lemma = decode_entities($1);
+		} elsif($line =~ m/<orth>([^<]+)<\/orth>/g)
+		{
+			$form = decode_entities($1);
+		} elsif($line =~ m/<pos>([^<]+)<\/pos>/g)
+		{
+			$tag = convertTag($1);
+		} elsif($line =~ m/<freq>([^<]+)<\/freq>/g)
+		{
+			$freq = $1;
+		} elsif($line =~ m/<\/wordf>/g)
+		{					
+			if($tag ne 0)
+			{
+				push(@tlffCombinations, ($tag, $lemma, $form, $freq));
+			}
+		}
+	}
 	
 	return @tlffCombinations;
 }

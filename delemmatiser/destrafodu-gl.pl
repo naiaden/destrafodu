@@ -29,12 +29,62 @@ require 'WeightingScheme.pl';
 
 # defaults
 $opt_w = 1;
-getopts( 'gl:p:e:L:t:T:w:l:' );
+#getopts( 'gl:p:e:L:t:T:w:l:' );
 
 
 our @trainData;
 our @testData;
 
+
+
+
+
+
+# generate train
+# e elex xml file, -e- reads stdin
+# p elex persistent
+
+my $outputHandler = *STDIN;
+getopts( 'e:o:p:' );
+
+if ($opt_e)
+{
+	print "Reading eLex XML file... ";
+	
+	if($opt_e eq "-")
+	{			
+		@trainData = extractElexXMLFileStdIn($opt_e);
+	} else
+	{
+		@trainData = extractElexXMLFile($opt_e);
+	}
+	
+	print "Number of entries read: ".(($#trainData+1)/4)."\n";
+}
+
+if ($opt_p)
+{
+	print "Reading persistent eLex lexicon file... ";
+	@trainData = readTrainLexicon($opt_t, \@trainData);
+	print "Number of entries read: ".(($#trainData+1)/4)."\n";
+}
+
+@trainTypeData = applyWeighting(2, \@trainData);
+print "Number of entries after appyling weight: ".(($#trainTypeData+1)/5)."\n";
+	
+if( $opt_o )
+{
+	writeWeightedTrainLexicon($opt_o, \@trainTypeData);
+}
+
+
+
+
+
+
+
+
+/*
 if( $opt_g )
 {
 	print "Generating lexicon files\n";	
@@ -117,7 +167,7 @@ if( $opt_g )
 	}
 	
 }
-
+*/
 
 
 
