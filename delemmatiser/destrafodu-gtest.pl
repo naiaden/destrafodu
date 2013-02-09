@@ -64,9 +64,9 @@ if( $opt_d )
 
 if( $opt_o )
 {
-	writeTestLexicon($opt_o, \@testData);
+	writeLexicon($opt_o, \@testData);
 	#print "Saved weighted train lexicon to $opt_o\n";
 } else
 {
-	writeTestLexiconStdOut(\@testData);
+	writeLexiconStdOut(\@testData);
 }

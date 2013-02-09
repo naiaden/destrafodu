@@ -1,19 +1,22 @@
-sub generateTypes
+sub generateDumbTypes
 {
 	my $lexiconRef = shift;
 	my @lexicon = @$lexiconRef;
 	
-	my @typeLexicon;
+	my @tokenLexicon;
 	
-	foreach(@lexicon)
+	for(my $i = 0; $i < $#lexicon; )
 	{
-		my $entry = $_;
-		my ($tag, $lemma, $form, $frequency) = $entry;
+		my $tag = $lexicon[$i++];
+		my $lemma = $lexicon[$i++];
+		my $form = $lexicon[$i++];
+		my $frequency = $lexicon[$i++];
+		my $mass = $lexicon[$i++];
 		
-		push(@typeLexicon, ($tag, $lemma, $form));
+		push(@tokenLexicon, ($tag, $lemma, $form));
 	}
 	
-	return @typeLexicon;
+	return @tokenLexicon;
 }
 
 sub generateTokens
@@ -23,10 +26,13 @@ sub generateTokens
 	
 	my @tokenLexicon;
 	
-	foreach(@lexicon)
+	for(my $i = 0; $i < $#lexicon; )
 	{
-		my $entry = $_;
-		my ($tag, $lemma, $form, $frequency) = $entry;
+		my $tag = $lexicon[$i++];
+		my $lemma = $lexicon[$i++];
+		my $form = $lexicon[$i++];
+		my $frequency = $lexicon[$i++];
+		my $mass = $lexicon[$i++];
 		
 		for(1..$frequency)
 		{
@@ -39,5 +45,28 @@ sub generateTokens
 
 sub generateMassTokens
 {
+	my $lexiconRef = shift;
+	my @lexicon = @$lexiconRef;
 	
+	my @tokenLexicon;
+	
+	for(my $i = 0; $i < $#lexicon; )
+	{
+		my $tag = $lexicon[$i++];
+		my $lemma = $lexicon[$i++];
+		my $form = $lexicon[$i++];
+		my $frequency = $lexicon[$i++];
+		my $mass = $lexicon[$i++];
+		
+		my $rounded = int((10*$mass) + 0.5);
+		
+		for(1..$rounded)
+		{
+			push(@tokenLexicon, ($tag, $lemma, $form));
+		}
+	}
+	
+	return @tokenLexicon;
 }
+
+1;

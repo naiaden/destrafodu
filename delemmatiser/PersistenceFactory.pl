@@ -298,7 +298,7 @@ sub writeWeightedTrainLexiconStdOut($$)
 	}
 }
 
-sub writeTestLexiconStdOut
+sub writeLexiconStdOut
 {
 	my $tlfCombinationsRef = shift;
 	my @tlfCombinations = @$tlfCombinationsRef;
@@ -341,13 +341,13 @@ sub writeTestLexiconStdOut
 	
 }
 
-sub writeTestLexicon($$)
+sub writeLexicon($$)
 {
 	my $lexiconFile = shift;
 	my $tlfCombinationsRef = shift;
 	my @tlfCombinations = @$tlfCombinationsRef;
 	
-	open OF, ">$lexiconFile" or die "Cannot open test lexicon output file $lexiconFile!\n";
+	open OF, ">$lexiconFile" or die "Cannot open lexicon output file $lexiconFile!\n";
 	
 	binmode OF, ":utf8";
 

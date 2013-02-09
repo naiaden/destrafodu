@@ -3,19 +3,21 @@ use Acme::Comment type => 'C++';
 use Getopt::Std;
 
 use strict;
-use warnings;
+#use warnings;
 
 binmode STDOUT, ":utf8";
 
-use vars qw( $opt_e $opt_o $opt_p $opt_w );
+use vars qw( $opt_e $opt_o $opt_p $opt_w $opt_t );
 
 require 'InfoExtractor.pl';
+require 'LexiconActions.pl';
 require 'PersistenceFactory.pl';
 require 'TagConverter.pl';
 require 'WeightingScheme.pl';
 
 # defaults
-$opt_w = 1;
+$opt_w = 2;
+$opt_t = 1;
 
 
 our @trainData;
@@ -23,10 +25,11 @@ our @trainData;
 #	-e <file|->		eLex XML file
 #	-p <file|->		persistent eLex lexicon file
 #	-o <file>		writes output to file, default is to stdout
-#	-w <n>			weighting scheme, n = {1,2,3}, default = 1
+#	-w <n>			weighting scheme, n = {1,2,3}, default = 2
+#	-t <n>			repetition scheme, n = {1,2,3}, default = 1 (type, token, masstoken)
 
 
-getopts( 'e:o:p:w:' );
+getopts( 'e:o:p:w:t:' );
 
 if ($opt_e)
 {
@@ -60,12 +63,28 @@ if ($opt_p)
 
 my @trainTypeData = applyWeighting($opt_w, \@trainData);
 #print "Number of entries after appyling weight: ".(($#trainTypeData+1)/5)."\n";
+
+my @trainOutputData;
+if ($opt_t eq 1)
+{
+	#my %seen =() ;
+	#@trainOutputData = grep { ! $seen{$_}++ } 
+	@trainOutputData = generateDumbTypes(\@trainTypeData) ;
 	
+}
+elsif( $opt_t eq 2)
+{
+	@trainOutputData = generateTokens(\@trainTypeData);
+}
+elsif( $opt_t eq 3)
+{
+	@trainOutputData = generateMassTokens(\@trainTypeData);
+}
+
 if( $opt_o )
 {
-	writeWeightedTrainLexicon($opt_o, \@trainTypeData);
-	#print "Saved weighted train lexicon to $opt_o\n";
+	writeLexicon($opt_o, \@trainOutputData);
 } else
 {
-	writeWeightedTrainLexiconStdOut($opt_o, \@trainTypeData);
+	writeLexiconStdOut(\@trainOutputData);
 }
