@@ -22,6 +22,8 @@ our @testData;
 #	-d <dir>		Lassy XML directory
 #	-o <file>		writes output to file, default is to stdout
 
+# currently only tokens are generated. Use sort -u for types.
+
 getopts( 'l:p:d:o:' );
 
 if ($opt_l)

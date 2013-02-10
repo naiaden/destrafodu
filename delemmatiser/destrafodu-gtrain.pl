@@ -7,7 +7,7 @@ use strict;
 
 binmode STDOUT, ":utf8";
 
-use vars qw( $opt_e $opt_o $opt_p $opt_w $opt_t );
+use vars qw( $opt_e $opt_o $opt_p $opt_w $opt_t $opt_m);
 
 require 'InfoExtractor.pl';
 require 'LexiconActions.pl';
@@ -25,11 +25,13 @@ our @trainData;
 #	-e <file|->		eLex XML file
 #	-p <file|->		persistent eLex lexicon file
 #	-o <file>		writes output to file, default is to stdout
+#	-m <file>		writes the lexicon entries with their relative mass to a file
 #	-w <n>			weighting scheme, n = {1,2,3}, default = 2
 #	-t <n>			repetition scheme, n = {1,2,3}, default = 1 (type, token, masstoken)
 
+# currently -t1 is not implemented correctly. Do a sort -u on t2 to get types.
 
-getopts( 'e:o:p:w:t:' );
+getopts( 'e:o:p:w:t:m:' );
 
 if ($opt_e)
 {
@@ -64,12 +66,17 @@ if ($opt_p)
 my @trainTypeData = applyWeighting($opt_w, \@trainData);
 #print "Number of entries after appyling weight: ".(($#trainTypeData+1)/5)."\n";
 
+if($opt_m)
+{
+	writeWeightedTrainLexicon($opt_m, \@trainTypeData);
+}
+
 my @trainOutputData;
 if ($opt_t eq 1)
 {
 	#my %seen =() ;
 	#@trainOutputData = grep { ! $seen{$_}++ } 
-	@trainOutputData = generateDumbTypes(\@trainTypeData) ;
+	@trainOutputData = generateDumbTypes(\@trainTypeData) ; # this does not do sort -u!!!
 	
 }
 elsif( $opt_t eq 2)

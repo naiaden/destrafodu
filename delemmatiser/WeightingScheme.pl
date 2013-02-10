@@ -40,16 +40,16 @@ sub applyWeighting($$)
 	my %tlFrequencies = ();
 	my %tlfFrequencies = ();
 	
-	for(my $itr = 0; $itr < $#tlffCombinations; $itr = $itr + 4)
+	for(my $itr = 0; $itr < $#tlffCombinations;)
 	{
 		my $line = $_;
 		
 		#my ($tag, $lemma, $form, $frequency) = ($line);
 		
-		$tag = $tlffCombinations[$itr];
-		$lemma = $tlffCombinations[$itr+1];
-		$form = $tlffCombinations[$itr+2];
-		$frequency = $tlffCombinations[$itr+3];
+		$tag = $tlffCombinations[$itr++];
+		$lemma = $tlffCombinations[$itr++];
+		$form = $tlffCombinations[$itr++];
+		$frequency = $tlffCombinations[$itr++];
 		
 		#print ">$tag $lemma $form $frequency\n";
 		
@@ -60,15 +60,7 @@ sub applyWeighting($$)
 		{
 			$tlfFrequencies{"$tag $lemma $form"} = $frequency;
 		}
-		
-		#if($itr % 100 eq 0)
-		#{
-		#	print "$itr ";
-		#	if($itr % 5000 eq 0)
-		#	{
-		#		print "\n";
-		#	}
-		#}
+
 	}
 	
 	print "\n";

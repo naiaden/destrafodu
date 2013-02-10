@@ -1,21 +1,17 @@
 use Acme::Comment type => 'C++';
 use Switch;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+sub filter($)
+{
+	my $output = shift;
+	
+	
+	#$output =~ s/"//gi;
+	$output =~ tr/"//d;
+	
+	
+	return $output;
+}
 
 sub readTrainLexiconStdIn($)
 {
@@ -151,42 +147,14 @@ sub writeTrainLexicon($$)
 	
 	binmode OF, ":utf8";
 	
-	my ($tag, $lemma, $form, $frequency);
-	
-	my $i = 1;
-	foreach(@tlffCombinations)
+	for(my $i = 0; $i < $#tlffCombinations; )
 	{
-		my $line = $_;
+		$tag = $tlffCombinations[$i++];
+		$lemma = $tlffCombinations[$i++];
+		$form = $tlffCombinations[$i++];
+		$frequency = $tlffCombinations[$i++];
 		
-		switch ($i)
-		{
-			case 1
-			{
-				$tag = $line;
-			}
-			case 2
-			{
-				$lemma = $line;
-			}
-			case 3
-			{
-				$form = $line;
-			} 
-			case 4
-			{
-				$frequency= $line;
-				
-				print OF "$tag $lemma $form $frequency\n";
-				
-				$i = 0;
-			}  
-			else
-			{
-				print STDERR "Unknown iterator in writeTrainLexicon: $i";
-			}
-		}
-		
-		$i++;
+		print filter("$tag $lemma $form $frequency")."\n";
 	}
 	
 	close OF;
@@ -202,46 +170,15 @@ sub writeWeightedTrainLexicon($$)
 	
 	binmode OF, ":utf8";
 
-	my ($tag, $lemma, $form, $frequency, $mass);
-	
-	my $i = 1;
-	foreach(@tlffmCombinations)
+	for(my $i = 0; $i < $#tlffmCombinations; )
 	{
-		my $line = $_;
+		$tag = $tlffmCombinations[$i++];
+		$lemma = $tlffmCombinations[$i++];
+		$form = $tlffmCombinations[$i++];
+		$frequency = $tlffmCombinations[$i++];
+		$mass = $tlffmCombinations[$i++];
 		
-		switch ($i)
-		{
-			case 1
-			{
-				$tag = $line;
-			}
-			case 2
-			{
-				$lemma = $line;
-			}
-			case 3
-			{
-				$form = $line;
-			} 
-			case 4
-			{
-				$frequency= $line;
-			}  
-			case 5
-			{
-				$mass = $line;
-				
-				print OF "$tag $lemma $form $frequency $mass\n";
-				
-				$i = 0;
-			}
-			else
-			{
-				print STDERR "Unknown iterator in writeWeightedTrainLexicon: $i";
-			}
-		}
-		
-		$i++;
+		print OF filter("$tag $lemma $form $frequency $mass")."\n";
 	}
 	
 	close OF;
@@ -255,46 +192,15 @@ sub writeWeightedTrainLexiconStdOut($$)
 	
 	binmode STDOUT, ":utf8";
 	
-	my ($tag, $lemma, $form, $frequency, $mass);
-	
-	my $i = 1;
-	foreach(@tlffmCombinations)
+	for(my $i = 0; $i < $#tlffmCombinations; )
 	{
-		my $line = $_;
+		$tag = $tlffmCombinations[$i++];
+		$lemma = $tlffmCombinations[$i++];
+		$form = $tlffmCombinations[$i++];
+		$frequency = $tlffmCombinations[$i++];
+		$mass = $tlffmCombinations[$i++];
 		
-		switch ($i)
-		{
-			case 1
-			{
-				$tag = $line;
-			}
-			case 2
-			{
-				$lemma = $line;
-			}
-			case 3
-			{
-				$form = $line;
-			} 
-			case 4
-			{
-				$frequency= $line;
-			}  
-			case 5
-			{
-				$mass = $line;
-				
-				print "$tag $lemma $form $frequency $mass\n";
-				
-				$i = 0;
-			}
-			else
-			{
-				print STDERR "Unknown iterator in writeWeightedTrainLexicon: $i";
-			}
-		}
-		
-		$i++;
+		print filter("$tag $lemma $form $frequency $mass")."\n";
 	}
 }
 
@@ -307,36 +213,13 @@ sub writeLexiconStdOut
 
 	my ($tag, $lemma, $form);
 	
-	my $i = 1;
-	foreach(@tlfCombinations)
+	for(my $i = 0; $i < $#tlfCombinations; )
 	{
-		my $line = $_;
+		$tag = $tlfCombinations[$i++];
+		$lemma = $tlfCombinations[$i++];
+		$form = $tlfCombinations[$i++];
 		
-		switch ($i)
-		{
-			case 1
-			{
-				$tag = $line;
-			}
-			case 2
-			{
-				$lemma = $line;
-			}
-			case 3
-			{
-				$form = $line;
-				
-				print "$tag $lemma $form\n";
-				
-				$i = 0;
-			} 
-			else
-			{
-				print STDERR "Unknown iterator in writeTestLexicon: $i";
-			}
-		}
-		
-		$i++;
+		print filter("$tag $lemma $form")."\n";
 	}
 	
 }
@@ -353,39 +236,72 @@ sub writeLexicon($$)
 
 	my ($tag, $lemma, $form);
 	
-	my $i = 1;
-	foreach(@tlfCombinations)
+	for(my $i = 0; $i < $#tlfCombinations; )
 	{
-		my $line = $_;
+		$tag = $tlfCombinations[$i++];
+		$lemma = $tlfCombinations[$i++];
+		$form = $tlfCombinations[$i++];
 		
-		switch ($i)
-		{
-			case 1
-			{
-				$tag = $line;
-			}
-			case 2
-			{
-				$lemma = $line;
-			}
-			case 3
-			{
-				$form = $line;
-				
-				print OF "$tag $lemma $form\n";
-				
-				$i = 0;
-			} 
-			else
-			{
-				print STDERR "Unknown iterator in writeTestLexicon: $i";
-			}
-		}
-		
-		$i++;
+		print OF filter("$tag $lemma $form")."\n";
 	}
 	
 	close OF;
 }
+
+
+
+
+
+
+sub readMassLexicon($$)
+{
+	my $massLexiconFile = shift;
+	my $tlfWordRef = shift;
+	my %tlfWord = %{$tlfWordRef};
+	
+	my %tlfMass = ();
+	
+	
+	open IF, "$massLexiconFile" or die "Cannot open mass lexicon input file $massLexiconFile!\n";
+	
+	while(<IF>)
+	{
+		if($_ =~ m/^([^\(]+\(.*?\)) ([^\s]+) ([^\s]+) ([^\s]+) ([^\s]+)$/)
+		{
+			my $tag = $1;
+			my $lemma = $2;
+			my $word = $3;
+			my $frequency = $4;
+			my $mass = $5;
+			
+			if(exists($tlfMass{"$tag $lemma"}))
+			{
+				if($mass > $tlfMass{"$tag $lemma"})
+				{
+					$tlfMass{"$tag $lemma"} = $mass;
+					$tlfWord{"$tag $lemma"} = $word;
+				} 
+			} else
+			{
+				$tlfMass{"$tag $lemma"} = $mass;
+				$tlfWord{"$tag $lemma"} = $word;
+			}
+		}
+	}
+	
+	close IF;
+	
+	return %tlfWord;
+}
+
+
+
+
+
+
+
+
+
+
 
 1;
