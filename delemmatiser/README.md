@@ -1,9 +1,6 @@
 Lexicon-based delemmatisation
 ==============
 
-Create files
---------------
-
 First you have to create a train lexicon. We will use eLex in this example as train lexicon.
 
     perl destrafodu-gtrain.pl -e/home/louis/p1/delemmatiser/data/corpora/elex1.1/lexdata/elex-1.1.xml \
@@ -35,7 +32,7 @@ For the unnormalised analysis, this gives something like:
     	V: 0.963962 (137165/142293)
     	A: 0.884425 (71106/80398)
 
-With case-insensitive 
+With case-insensitive analysis
 
     perl destrafodu-lex.pl -m/tmp/destrafodu/eLex.w2.mrlexicon -i/tmp/destrafodu/Lassy.token | perl destrafodu-analysis.pl -i
 
