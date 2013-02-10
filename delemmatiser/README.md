@@ -29,15 +29,18 @@ This will yield all the predictions. If you are more interested in the performan
     perl destrafodu-lex.pl -m/tmp/destrafodu/eLex.w2.mrlexicon -i/tmp/destrafodu/Lassy.token | perl destrafodu-analysis.pl
 
 For the unnormalised analysis, this gives something like:
+
     Overall performance:
     	N: 0.804988 (198634/246754)
     	V: 0.963962 (137165/142293)
     	A: 0.884425 (71106/80398)
 
 With case-insensitive 
+
     perl destrafodu-lex.pl -m/tmp/destrafodu/eLex.w2.mrlexicon -i/tmp/destrafodu/Lassy.token | perl destrafodu-analysis.pl -i
 
 The results are:
+
     Overall performance:
     	N: 0.867771 (214126/246754)
     	V: 0.981981 (139729/142293)
