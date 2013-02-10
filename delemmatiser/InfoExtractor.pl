@@ -97,8 +97,8 @@ sub extractLassyCountFileStdIn ()
 		if($line =~ m/\s+(\d+) ([^ ]+) ([^ ]+) ([^ ]+)$/g)
 		{
 			my $frequency = $1;
-			$lemma = $2;
-			$form = $3;
+			$lemma = $3;
+			$form = $2;
 			$tag = $4;
 			
 			my $convertedTag = convertTag($tag);
@@ -136,8 +136,8 @@ sub extractLassyCountFile ($)
 		if($line =~ m/\s+(\d+) ([^ ]+) ([^ ]+) ([^ ]+)$/g)
 		{
 			my $frequency = $1;
-			$lemma = $2;
-			$form = $3;
+			$lemma = $3;
+			$form = $2;
 			$tag = $4;
 			
 			my $convertedTag = convertTag($tag);
