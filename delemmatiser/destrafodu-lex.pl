@@ -3,7 +3,7 @@ use Acme::Comment type => 'C++';
 use Getopt::Std;
 
 use strict;
-#use warnings;
+use warnings;
 
 binmode STDOUT, ":utf8";
 binmode STDIN, ":utf8";
@@ -20,7 +20,7 @@ require 'WeightingScheme.pl';
 #	-i <file|->		reads the input
 #	-l				returns lemma if tag-lemma not in lexicon
 
-getopts('m:i: ');
+getopts('m:i:l ');
 
 
 my %tlfWord = ();

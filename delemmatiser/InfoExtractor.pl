@@ -1,6 +1,9 @@
 use Acme::Comment type => 'C++';
 use HTML::Entities;
 use File::Find::Rule ;
+use Encode;
+
+binmode STDIN, ":utf8";
 
 our $lassyTagRegex = qr/^\s*<node.*?lemma=\"(.*?)\".*?postag=\"(.*?)\".*?word=\"(.*?)\".*?\/>$/;
 our $elexTagRegex = qr/<pos>([^<]+)<\/pos>/;
@@ -124,6 +127,8 @@ sub extractLassyCountFile ($)
 	my @tlfCombinations;
 	
 	open IF, "$lassyCountFile" or die "Cannot open lassy count input file $lassyCountFile!\n";
+	
+	binmode IF, "utf8";
 	
 	my $lemma;
 	my $form;

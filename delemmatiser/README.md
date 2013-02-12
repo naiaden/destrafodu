@@ -42,3 +42,37 @@ The results are:
     	N: 0.867771 (214126/246754)
     	V: 0.981981 (139729/142293)
     	A: 0.951143 (76470/80398)
+
+    	
+ML-based delemmatisation
+==============
+
+First you have to create ARFF files that contain the features and the class. First for the train examples:
+
+    cat /tmp/destrafodu/eLex.w2.masstoken	\
+        | perl destrafodu-toarff.pl -p/home/louis/p1/delemmatiser/data/particles.txt	\
+        > /tmp/destrafodu/eLex.w2.masstoken.arff
+        
+Then for the test examples:
+        
+    cat /tmp/destrafodu/Lassy.token	\
+        | perl destrafodu-toarff.pl -p/home/louis/p1/delemmatiser/data/particles.txt	\
+        > /tmp/destrafodu/Lassy.token.arff
+        
+Then it's just a matter of running it through a classifier such as timbl:
+
+    timbl -a 1 -t -t /tmp/destrafodu/Lassy.token.arff -f /tmp/destrafodu/eLex.w2.masstoken.arff -F ARFF -o /tmp/destrafodu/eMT.lTO.w2.predictions
+    
+Return its output back to lexicon form and analyse it:
+
+    cat /tmp/destrafodu/eMT.lTO.w2.predictions | perl destrafodu-fromarff.pl | perl destrafodu-analysis.pl -i
+    
+Which returns something like:
+
+    Overall performance:
+	    N: 0.990007 (244298/246764)
+	    V: 0.988664 (140681/142294)
+	    A: 0.991144 (79684/80396)
+
+
+    

@@ -1,5 +1,6 @@
 use Acme::Comment type => 'C++';
 use Switch;
+use Encode;
 
 sub filter($)
 {

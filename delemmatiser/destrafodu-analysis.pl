@@ -12,6 +12,9 @@ binmode STDIN, ":utf8";
 use vars qw( $opt_i );
 getopts( 'i' );
 
+#	-i 			ignore case in analysis
+#	-p <file>	read predictions from file						NI
+#	-o <file>	write statistics to file, default is to stdout	NI
 
 my %tagTotal;
 my %tagError;
