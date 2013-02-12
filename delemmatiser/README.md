@@ -75,4 +75,33 @@ Which returns something like:
 	    A: 0.991144 (79684/80396)
 
 
+
+Set up a timbl server
+==============
+
+Create a config file timbleConfiguration:
+
+    port=7000
+    maxconn=100
+    destrafodu="-a1 -f /tmp/destrafodu/eLex.w2.masstoken.arff -F ARFF"
+    
+
+Start the server with:
+    
+    timblserver --config timblOptions
+
+The first thing you have to do when you start the client is select the default base (anigrides is the name of the server):
+
+    timblclient -n anigrides -p 7000
+    base destrafodu
+    
+Now everything's set up and you can ask the server to classify new instances with:
+
+    c V(fin=fin_tense=pres_num=sing_form=norm),"",0,"n","nj","nji","njiz",?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,"-.zijn +.is"
+    
+For which it gives the result:
+
+    CATEGORY {"-.zijn\_+.is"}
+    
+Which seems about right :)
     
