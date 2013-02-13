@@ -1,47 +1,69 @@
 Lexicon-based delemmatisation
 ==============
 
-First you have to create a train lexicon. We will use eLex in this example as train lexicon.
+Early normalisation
+--------------
+If you want to train on eLex with relative frequency scaling and case normalisation and use the non-seen triples as well:
 
-    perl destrafodu-gtrain.pl -e/home/louis/p1/delemmatiser/data/corpora/elex1.1/lexdata/elex-1.1.xml \
-                            -o/tmp/destrafodu/eLex.w2.masstoken \
-                            -w2 \
-                            -t3 \
-                            -m/tmp/destrafodu/eLex.w2.mrlexicon
+    perl destrafodu-createlexicon.pl -e/home/louis/p1/delemmatiser/data/corpora/elex1.1/lexdata/elex-1.1.xml -w2 -t3 -i -o/tmp/destrafodu/eLex.w2.t3.i.lexicon -m/tmp/eLex.w2.t3.i.rm
 
-Here we use a simple +1 weighting for all frequencies (-w2), and we generate a lexicon where the frequencies of the tokens are relative to the frequency within the tag (-t3).
-We store the lexicon (-o), and the intermediate masslexicon file (-m) as it will turn out to be convenient for a later step.
+and you want to test on Lassy's case normalised tokens:
 
-Second, you need a test lexicon. We use the entries from the Lassy corpus to generate a lexicon.
+    perl destrafodu-createlexicon.pl -l/home/louis/p1/delemmatiser/data/corpora/Lassy1.0/Freqs/WORD-LEMMA-POS.freq -w1 -t2 -i -o/tmp/destrafodu/Lassy.w1.t2.i.lexicon
 
-    perl destrafodu-gtest.pl -l/home/louis/p1/delemmatiser/data/corpora/Lassy1.0/Freqs/WORD-LEMMA-POS.freq  \
-                            -o/tmp/destrafodu/Lassy.token
+After creating the lexicon files, you can do the delemmatisation:
 
-The last step is to do the actually delemmatisation:
+    perl destrafodu-lex.pl -m/tmp/eLex.w2.t3.i.rm -i/tmp/destrafodu/Lassy.w1.t2.i.lexicon | perl destrafodu-analysis.pl
 
-    perl destafodu-lex.pl -m/tmp/destrafodu/eLex.w2.mrlexicon -i/tmp/destrafodu/Lassy.token
-
-This will yield all the predictions. If you are more interested in the performance, and the error breakdown:
-
-    perl destrafodu-lex.pl -m/tmp/destrafodu/eLex.w2.mrlexicon -i/tmp/destrafodu/Lassy.token | perl destrafodu-analysis.pl
-
-For the unnormalised analysis, this gives something like:
+which gives as result, something similar to:
 
     Overall performance:
-    	N: 0.804988 (198634/246754)
-    	V: 0.963962 (137165/142293)
-    	A: 0.884425 (71106/80398)
+    	N: 0.885682 (218550/246759)
+    	V: 0.988608 (140672/142293)
+    	A: 0.963407 (77456/80398)
 
-With case-insensitive analysis
+With case-insensitive analysis:
 
-    perl destrafodu-lex.pl -m/tmp/destrafodu/eLex.w2.mrlexicon -i/tmp/destrafodu/Lassy.token | perl destrafodu-analysis.pl -i
+    perl destrafodu-lex.pl -m/tmp/eLex.w2.t3.i.rm -i/tmp/destrafodu/Lassy.w1.t2.i.lexicon | perl destrafodu-analysis.pl -i
 
-The results are:
+the result is:
 
     Overall performance:
-    	N: 0.867771 (214126/246754)
-    	V: 0.981981 (139729/142293)
-    	A: 0.951143 (76470/80398)
+    	N: 0.885682 (218550/246759)
+    	V: 0.988608 (140672/142293)
+    	A: 0.963407 (77456/80398)
+
+Late normalisation
+--------------
+
+Similar results can also be achieved with the following commands, by normalising the case in the analysis phase:
+
+    perl destrafodu-createlexicon.pl -e/home/louis/p1/delemmatiser/data/corpora/elex1.1/lexdata/elex-1.1.xml -w2 -t3 -o/tmp/destrafodu/eLex.w2.t3.lexicon -m/tmp/destrafodu/eLex.w2.t3.rm
+    
+    perl destrafodu-createlexicon.pl -l/home/louis/p1/delemmatiser/data/corpora/Lassy1.0/Freqs/WORD-LEMMA-POS.freq -w1 -t2 -o/tmp/destrafodu/Lassy.w1.t2.lexicon
+    
+    perl destrafodu-lex.pl -m/tmp/destrafodu/eLex.w2.t3.rm -i/tmp/destrafodu/Lassy.w1.t2.lexicon | perl destrafodu-analysis.pl -i
+
+Which gives as result:
+
+    Overall performance:
+    	N: 0.881617 (217546/246758)
+    	V: 0.988608 (140672/142293)
+    	A: 0.962362 (77372/80398)
+
+Compare these results to the case-sensitive analysis, and as expected there is a discrepancy in the performance. In the early-normalisation analysis, this discrepancy is not present.
+
+    perl destrafodu-lex.pl -m/tmp/destrafodu/eLex.w2.t3.rm -i/tmp/destrafodu/Lassy.w1.t2.lexicon | perl destrafodu-analysis.pl
+
+ 
+
+    Overall performance:
+    	N: 0.818320 (201927/246758)
+    	V: 0.970512 (138097/142293)
+    	A: 0.894997 (71956/80398)
+
+
+Concluding, because the lexicon-based delemmatisation strategy is based on simple case-sensitive lookup in the lexicon, it matters in which stage you perform the case normalisation. Not surprisingly, the performance is a bit better in the early-normalisation stage.
 
     	
 ML-based delemmatisation
