@@ -33,7 +33,7 @@ sub showWord($)
 sub suffices
 {
 	my $word = decode_utf8(shift);
-	my $length = shift // length($word); #/
+	my $length = shift;
 	my $itr = 0;
 	my @suffices = ();
 	
@@ -180,3 +180,5 @@ sub readParticle($)
 	
 	return @particles;
 }
+
+1;

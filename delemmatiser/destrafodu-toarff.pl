@@ -12,10 +12,8 @@ require 'arffthings.pl';
 binmode STDOUT, ":utf8";
 binmode STDIN,  ":utf8";
 
-
-
-use vars qw( $opt_p $opt_s );
-getopts( 'p:s:' );
+use vars qw( $opt_p $opt_s $opt_o $opt_i );
+getopts( 'p:s:o:i:' );
 
 my @DLParticles;
 my $maxSuffixLength = 35;
@@ -30,10 +28,39 @@ if( $opt_s)
 	$maxSuffixLength = $opt_s	
 }
 
+my $fh;
+if ($opt_o) {
+	if ($opt_o eq "-") 
+	{
+		$fh = \*STDOUT;
+	} else
+	{
+   open($fh, '>', $opt_o) or die;
+	}
+} else {
+   $fh = \*STDOUT;
+}
+binmode $fh, ":utf8";
+
+my $ifh;
+if ($opt_i) {
+	if ($opt_i eq "-") 
+	{
+		$ifh = \*STDIN;
+	} else
+	{
+   		open($ifh, '<', $opt_i) or die;
+	}
+
+} else {
+   $ifh = \*STDIN;
+}
+binmode $ifh, ":utf8";
+
 # 	-p		particles file
 # 	-s		max suffix length, default=35
 
-print "% 1. Title: Nouns\n" . "%\n"
+print $fh "% 1. Title: destrafodu\n" . "%\n"
     . "% 2. Sources\n" . "%\n"
     . "\@RELATION nouns\n" . "\n"
     . "\@ATTRIBUTE tag		string\n"
@@ -41,40 +68,35 @@ print "% 1. Title: Nouns\n" . "%\n"
     . "\@ATTRIBUTE capital	{1,0}\n";
 foreach my $attrItr ( 1 .. $maxSuffixLength )
 {
-	print "\@ATTRIBUTE c$attrItr\t\tstring\n";
+	print $fh "\@ATTRIBUTE c$attrItr\t\tstring\n";
 }
-print "\@ATTRIBUTE class	string\n";
-print "\@DATA\n";
+print $fh "\@ATTRIBUTE class	string\n";
+print $fh "\@DATA\n";
 
-while (<>)
+while (<$ifh>)
 {
 	if ( $_ =~ /^(N\([^\s]+\)) ([^\s]+) ([^\s]+)/ )
 	{
-		
-
 		my $tag = $1;
 		my $word = $2;
 		my $form = $3;
-		
-		
+			
 		$tag =~ s/\,/_/g;
 		
 		my %features = computeFeatures( $word );
 
 		my $diff = extDifff( $word, $form );
 
-		print "$tag,?," . ( $word =~ /^[A-Z]/ ? "1" : "0" );
+		print $fh "$tag,?," . ( $word =~ /^[A-Z]/ ? "1" : "0" );
 		foreach my $itr ( suffices( $word, $maxSuffixLength ) )
 		{
-			print "," . ( $itr ne "" ? "\"" . $itr . "\"" : "?" );
+			print $fh "," . ( $itr ne "" ? "\"" . $itr . "\"" : "?" );
 		}
-		print ",\"$diff\"\n";
+		print $fh ",\"$diff\"\n";
 	}
 	
 	elsif ( $_ =~ /^(V\([^\s]+\)) ([^\s]+) ([^\s]+)/ )
 	{
-		
-
 		my $tag = $1;
 		my $word = $2;
 		my $form = $3;
@@ -87,35 +109,32 @@ while (<>)
 
 		my $sWP = startsWithParticle($word);
 
-		print "$tag,".($sWP ? "\"$sWP\"" : "\"\"")."," . ( $word =~ /^[A-Z]/ ? "1" : "0" );
-		foreach my $itr ( suffices( $word, 35 ) )
+		print $fh "$tag,".($sWP ? "\"$sWP\"" : "\"\"")."," . ( $word =~ /^[A-Z]/ ? "1" : "0" );
+		foreach my $itr ( suffices( $word, $maxSuffixLength ) )
 		{
-			print "," . ( $itr ne "" ? "\"" . $itr . "\"" : "?" );
+			print $fh "," . ( $itr ne "" ? "\"" . $itr . "\"" : "?" );
 		}
-		print ",\"$diff\"\n";
+		print $fh ",\"$diff\"\n";
 	}
 	
 	elsif ( $_ =~ /^(Adjv\([^\s]+\)) ([^\s]+) ([^\s]+)/ )
 	{
-		
-
 		my $tag = $1;
 
 		my $word = $2;
 		my $form = $3;
-		
 		
 		$tag =~ s/\,/_/g;
 		my %features = computeFeatures( $word );
 
 		my $diff = extDifff( $word, $form );
 
-		print "$tag,?,?";
-		foreach my $itr ( suffices( $word, 35 ) )
+		print $fh "$tag,?,?";
+		foreach my $itr ( suffices( $word, $maxSuffixLength ) )
 		{
-			print "," . ( $itr ne "" ? "\"" . $itr . "\"" : "?" );
+			print $fh "," . ( $itr ne "" ? "\"" . $itr . "\"" : "?" );
 		}
-		print ",\"$diff\"\n";
+		print $fh ",\"$diff\"\n";
 	}
 }
 

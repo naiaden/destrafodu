@@ -51,6 +51,30 @@ accents or other diacritic signs are mapped to their "base" letter: ë -> e, ï 
 The second method is case normalisation (-i). All characters are mapped to their lower case equivalent.
 In case both options are used, first the diacritics are removed, then the characters are mapped to lower case.
 
+Create ARFF files
+==============
+
+The use machine learning, we have to convert our data into features. We use a fairly simple approach
+based on the trie data structure. For each word, we look the reverse word endings for all lengths. So, for the
+word "fiets", we use "s", "st", "ste", "stei", "steif". As additional data we use the tag, whether the word
+starts with a capital, and if the word starts with a prefix. So, hardly any magic here.
+
+We use a script to generate these features, and write them to ARFF format. This is convenient, because
+many machine learning applications can read this format. 
+
+    destrafodu-toarff.pl
+    
+    # 	-p		        particles file
+    
+    # 	-s		        max suffix length, default=35
+    
+    #	-i <file|->		reads input from file, default is from stdin
+    #	-o <file|->		writes output to file, default is to stdout
+
+The max suffix length can be changed if there are words with more than 35 characters. Tests show that the 
+suffixes 30 to 35 have very little information gain (< E-05), so you might want to get rid of them. Generally, this is
+not necessary, and the default value performs well enough in general.
+
 Lexicon-based delemmatisation
 ==============
 
@@ -124,30 +148,38 @@ ML-based delemmatisation
 
 First you have to create ARFF files that contain the features and the class. First for the train examples:
 
-    cat /tmp/destrafodu/eLex.w2.masstoken	\
-        | perl destrafodu-toarff.pl -p/home/louis/p1/delemmatiser/data/particles.txt	\
-        > /tmp/destrafodu/eLex.w2.masstoken.arff
+    perl destrafodu-toarff.pl -i/tmp/destrafodu/eLex.w2.t2.i.lexicon -p/home/louis/p1/delemmatiser/data/particles.txt -o/tmp/destrafodu/eLex.w2.t2.i.arff
         
 Then for the test examples:
         
-    cat /tmp/destrafodu/Lassy.token	\
-        | perl destrafodu-toarff.pl -p/home/louis/p1/delemmatiser/data/particles.txt	\
-        > /tmp/destrafodu/Lassy.token.arff
+    perl destrafodu-toarff.pl -i/tmp/destrafodu/Lassy.w1.t2.i.lexicon -p/home/louis/p1/delemmatiser/data/particles.txt -o/tmp/destrafodu/Lassy.w1.t2.i.arff
         
 Then it's just a matter of running it through a classifier such as timbl:
 
-    timbl -a 1 -t -t /tmp/destrafodu/Lassy.token.arff -f /tmp/destrafodu/eLex.w2.masstoken.arff -F ARFF -o /tmp/destrafodu/eMT.lTO.w2.predictions
-    
-Return its output back to lexicon form and analyse it:
+    timbl -a 1 -t -t /tmp/destrafodu/Lassy.w1.t2.i.arff -f /tmp/destrafodu/eLex.w2.t2.i.arff -F ARFF -o /tmp/destrafodu/eMT.lTO.i.predictions
 
-    cat /tmp/destrafodu/eMT.lTO.w2.predictions | perl destrafodu-fromarff.pl | perl destrafodu-analysis.pl -i
+With the result
+
+    overall accuracy:        0.990129  (464820/469454)
+
+it's getting somewhere, as this is the accuracy of predicting the right edit script. However there are multiple edit scripts that
+can yield the same form given a lemma. We can analyse the results by applying the predicted edit scripts
+on the lemmas:
+
+    perl destrafodu-fromarff.pl -i/tmp/destrafodu/eMT.lTO.i.predictions | perl destrafodu-analysis.pl
     
 Which returns something like:
 
     Overall performance:
-	    N: 0.990007 (244298/246764)
-	    V: 0.988664 (140681/142294)
-	    A: 0.991144 (79684/80396)
+    	N: 0.990854 (244507/246764)
+    	V: 0.990555 (140950/142294)
+    	A: 0.991579 (79719/80396)
+
+Which seems a little bit better, as we expected. The case-insensitive analysis yields the same results,
+but since we used case-normalised lexicon files, this is no suprise.
+
+(The numbers here a bit different from LEX results, this is because some entries in the lexicon contain a
+comma. Currently, they mess up the ARFF file. We will fix this later.)
 
 
 Hybrid approach
