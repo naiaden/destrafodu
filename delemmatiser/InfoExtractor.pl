@@ -153,13 +153,13 @@ sub extractLassyCountFileStdIn ()
 	return @tlfCombinations;
 }
 
-sub extractLassyCountFile ($)
+sub extractLassyCountFile ($$$)
 {
 	my $fh = shift;
 	my $normaliseDiacritics = shift;
 	my $normaliseCase = shift;
 	
-	my @tlfCombinations;
+	my @tlffCombinations;
 	
 	my $lemma;
 	my $form;
@@ -179,17 +179,19 @@ sub extractLassyCountFile ($)
 			my $convertedTag = convertTag($tag);
 			if($convertedTag)
 			{
-				for(1 .. $frequency)
-				{
-					push(@tlfCombinations, ($convertedTag, $lemma, $form));
-				}
+				#for(1 .. $frequency)
+				#{
+				#	push(@tlfCombinations, ($convertedTag, $lemma, $form));
+				#}
+				
+				push(@tlffCombinations, ($convertedTag, $lemma, $form, $frequency));
 			}
 			
 			
 		} 
 	}
 	
-	return @tlfCombinations;
+	return @tlffCombinations;
 }
 
 sub extractElexXMLFile ($$$)

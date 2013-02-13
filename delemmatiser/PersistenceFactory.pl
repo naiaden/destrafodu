@@ -34,7 +34,7 @@ sub readPersistentFile($)
 	}
 	binmode $fh, ":utf8";
 
-	return readTrainLexicon($fh, $normaliseDiacritics, $normaliseCase);
+	return readPersistentLexicon($fh, $normaliseDiacritics, $normaliseCase);
 }
 
 sub readLassyCountFile($)
@@ -54,8 +54,6 @@ sub readLassyCountFile($)
 	return extractLassyCountFile($fh, $normaliseDiacritics, $normaliseCase);
 }
 
-
-
 sub filter($)
 {
 	my $output = shift;
@@ -68,7 +66,7 @@ sub filter($)
 	return $output;
 }
 
-sub readTrainLexicon($$$)
+sub readPersistentLexicon($$$)
 {
 	my $fh = shift;
 	my $normaliseDiacritics = shift;
@@ -98,66 +96,9 @@ sub readTrainLexicon($$$)
 	return @tlffCombinations;
 }
 
-sub readTestLexiconStdIn($)
-{
-	my $tlfCombinationsRef = shift;
-	my @tlfCombinations = @$tlfCombinationsRef;
-		
-	binmode STDIN, ":utf8";
-	
-	my ($tag, $lemma, $form);
-	
-	while(<>)
-	{
-		my $line = $_;
-		
-		unless($line =~ m/^#/g)
-		{
-			my @tlfLocal = split(/\s+/, $line);
-			
-			$tag = $tlfLocal[0];
-			$lemma = $tlfLocal[1];
-			$form = $tlfLocal[2];
-	
-			push(@tlfCombinations, ($tag, $lemma, $form));
-		}
-	}
-	
-	return @tlfCombinations;
-}
 
-sub readTestLexicon($$)
-{
-	my $lexiconFile = shift;
-	my $tlfCombinationsRef = shift;
-	my @tlfCombinations = @$tlfCombinationsRef;
-	
-	open IF, "<$lexiconFile" or die "Cannot open test lexicon input file $lexiconFile!\n";
-	
-	binmode IF, ":utf8";
-	
-	my ($tag, $lemma, $form);
-	
-	while(<IF>)
-	{
-		my $line = $_;
-		
-		unless($line =~ m/^#/g)
-		{
-			my @tlfLocal = split(/\s+/, $line);
-			
-			$tag = $tlfLocal[0];
-			$lemma = $tlfLocal[1];
-			$form = $tlfLocal[2];
-	
-			push(@tlfCombinations, ($tag, $lemma, $form));
-		}
-	}
-	
-	close IF;
-	
-	return @tlfCombinations;
-}
+
+
 
 sub writeTrainLexicon($$)
 {

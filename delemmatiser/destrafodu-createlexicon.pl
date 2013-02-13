@@ -7,7 +7,7 @@ use strict;
 
 binmode STDOUT, ":utf8";
 
-use vars qw( $opt_e $opt_o $opt_p $opt_w $opt_t $opt_m $opt_M $opt_d $opt_i $opt_l);
+use vars qw( $opt_e $opt_o $opt_p $opt_w $opt_t $opt_m $opt_M $opt_d $opt_i $opt_l $opt_L $opt_P);
 
 require 'InfoExtractor.pl';
 require 'LexiconActions.pl';
@@ -26,9 +26,11 @@ $opt_i = 0;
 our @trainData;
 
 #	-e <file|->		eLex XML file
-#	-p <file|->		persistent eLex lexicon file
 
-#	-l <file|->		Lassy frequency counts file	
+#	-p <file|->		persistent lexicon file
+
+#	-l <file|->		Lassy frequency counts file
+#	-L <dir>		Lassy XML directory, currently not implemented
 
 #	-o <file|->		writes output to file, default is to stdout
 #	-m <file>		writes the lexicon entries with their relative mass to a file
@@ -40,7 +42,7 @@ our @trainData;
 #	-d 				normalise diacritics
 #   -i				normalise all characters to lower case
 
-getopts( 'e:o:p:w:t:m:M:dil:' );
+getopts( 'e:o:p:w:t:m:M:dil:P:L:' );
 
 
 if ($opt_e)
@@ -52,18 +54,26 @@ if ($opt_e)
 	#print "Number of entries read: ".(($#trainData+1)/4)."\n";
 } elsif ($opt_p)
 {
-	#print "Reading eLex persistent lexicon file... ";
+	#print "Reading persistent lexicon file... ";
 	
-	@trainData = readPersistentFile($opt_p, $opt_d, $opt_i);
+	@trainData = readPersistenteLexFile($opt_p, $opt_d, $opt_i);
 	
 	#print "Number of entries read: ".(($#trainData+1)/4)."\n";
 } elsif ($opt_l)
 {
 	#print "Reading Lassy counts file... ";
 	
-	@trainData = readPersistentFile($opt_p, $opt_d, $opt_i);
+	@trainData = readLassyCountFile($opt_l, $opt_d, $opt_i);
 	
 	#print "Number of entries read: ".(($#trainData+1)/3)."\n";
+} elsif( $opt_d )
+{
+	#print "Reading Lassy XML directory... ";
+	#@testData = extractLassyXMLDirectory($opt_d);
+	
+	die ("Reading a Lassy XML directory is currently not implemented.\nUse the count file.\n");
+	
+	#print "Number of entries read: ".(($#testData+1)/3)."\n";
 }
 
 
