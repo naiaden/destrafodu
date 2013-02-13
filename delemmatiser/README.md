@@ -51,8 +51,11 @@ accents or other diacritic signs are mapped to their "base" letter: ë -> e, ï 
 The second method is case normalisation (-i). All characters are mapped to their lower case equivalent.
 In case both options are used, first the diacritics are removed, then the characters are mapped to lower case.
 
-Create ARFF files
+ARFF 
 ==============
+
+Create ARFF files
+--------------
 
 The use machine learning, we have to convert our data into features. We use a fairly simple approach
 based on the trie data structure. For each word, we look the reverse word endings for all lengths. So, for the
@@ -74,6 +77,89 @@ many machine learning applications can read this format.
 The max suffix length can be changed if there are words with more than 35 characters. Tests show that the 
 suffixes 30 to 35 have very little information gain (< E-05), so you might want to get rid of them. Generally, this is
 not necessary, and the default value performs well enough in general.
+
+A typical example of a line in the ARFF looks like this:
+
+    V(fin=fin_tense=pres_num=sing_form=t),"",0,"n","ne","nez","nezj","nezji","nezjiw","nezjiwr","nezjiwre","nezjiwrev",?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,"-.zen +.st"
+
+Create ARFF files
+--------------
+
+After we have predicted the edit script with the machine learning approach, we have to apply this script to the lemma.
+We can use a simple script to do that:
+
+    destrafodu-fromarff.pl
+    
+    #   -i <file|->     reads input from file, default is from stdin
+    #   -o <file|->     writes output to file, default is to stdout
+    
+It takes the ARFF file with the predicted edit scripts, and creates an extended lexicon with tag-lemma-form-prediction quadruples.
+This file can then be used for analysis. 
+
+Analysis
+==============
+
+Of course want to know how the system performs. You can analyse the results within the context of a practical
+application, but you can also quantitatively assess the performance of the system. We have a script for that:
+
+    destrafodu-analysis.pl
+    
+    #   -i				normalise all characters to lower case
+    #	-d 				normalise diacritics
+    
+    #	-p <file|->		read predictions from file						
+    #	-o <file|->		write statistics to file, default is to stdout
+    
+If you didn't normalise the input, you can always choose to normalise after applying the edit scripts. Later, we 
+have an example where it is shown that this gives a slight disadvantage in the performance. However, the advantage is
+that during the whole process you can keep the original case information. The same holds for the normalisation of 
+diacritics.
+
+The idea is that you read in an extended lexicon consisting of tag-lemma-form-prediction quadruples. The script then
+looks whether the predicted form matches the observed form (after normalisation for both forms, if applicable). It 
+breaks the results in errors per part-of-speech, and for each part-of-speech, per tag. For example:
+
+    Overall performance:
+    	N: 0.871752 (215118/246765)
+    	V: 0.981974 (139729/142294)
+    	A: 0.952088 (76546/80398)
+
+    Performance per tag:
+    	Tag				                Errors per tag/	Percentage  Percentage
+    					                tag occurences	per tag	    of total
+    	N(dim=dim,num=plu,case=nom)     93/597          15.58       0.019810
+    	N(dim=dim,num=sing,case=nom)    136/1016        13.39       0.028970
+    	N(dim=norm,num=plu,case=nom)    7163/57866      12.38       1.525805
+    	N(dim=norm,num=sing,case=dat)   27/596          4.53        0.005751
+    	N(dim=norm,num=sing,case=gen)   967/1860        51.99       0.205983
+    	N(dim=norm,num=sing,case=nom)   23261/184830    12.59       4.954873
+    
+    	V(fin=fin,tense=past,num=plu,form=norm) 54/7176         0.75        0.011503
+    	V(fin=fin,tense=past,num=sing,form=norm)295/20585       1.43        0.062839
+    	V(fin=fin,tense=pres,num=plu,form=norm) 87/16893        0.52        0.018532
+    	V(fin=fin,tense=pres,num=sing,form=norm)280/19853       1.41        0.059643
+    	V(fin=fin,tense=pres,num=sing,form=t)   310/22286       1.39        0.066034
+    	V(fin=infin,form=norm)          283/25659       1.10        0.060282
+    	V(fin=part,tense=past,form=e)   255/2908        8.77        0.054318
+    	V(fin=part,tense=past,form=en)  55/262          20.99       0.011716
+    	V(fin=part,tense=past,form=norm)807/23397       3.45        0.171901
+    	V(fin=part,tense=pres,form=e)   42/2263         1.86        0.008947
+    	V(fin=part,tense=pres,form=en)  4/32            12.50       0.000852
+    	V(fin=part,tense=pres,form=norm)93/980          9.49        0.019810
+    
+    	Adjv(deg=comp,form=e)           8/1030          0.78        0.001704
+    	Adjv(deg=comp,form=en)          0/258           0.00        0.000000
+    	Adjv(deg=comp,form=norm)        42/2809         1.50        0.008947
+    	Adjv(deg=pos,form=e)            2800/40815      6.86        0.596434
+    	Adjv(deg=pos,form=en)           148/880         16.82       0.031526
+    	Adjv(deg=pos,form=norm)         803/32358       2.48        0.171049
+    	Adjv(deg=sup,form=e)            47/2015         2.33        0.010012
+    	Adjv(deg=sup,form=norm)         4/233           1.72        0.000852
+ 
+As you can see this example clearly shows the results for the lexicon-based without returning
+the lemma if unknown. An awful lot of mistakes are made for N(dim=norm,num=sing,case=nom).
+With this overview you can see how many mistakes there are for each tag, and how they influence
+the final performance.
 
 Lexicon-based delemmatisation
 ==============

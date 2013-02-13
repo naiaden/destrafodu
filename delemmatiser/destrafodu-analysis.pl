@@ -4,15 +4,22 @@ use Getopt::Std;
 
 use strict;
 
+require 'InfoExtractor.pl';
+
 binmode STDOUT, ":utf8";
 binmode STDIN,  ":utf8";
 
-use vars qw( $opt_i $opt_o $opt_p );
-getopts('io:p:');
+use vars qw( $opt_i $opt_d $opt_o $opt_p );
 
-#	-i 			ignore case in analysis
-#	-p <file>	read predictions from file						NI
-#	-o <file>	write statistics to file, default is to stdout	NI
+$opt_i = 0;
+$opt_d = 0;
+
+getopts('ido:p:');
+
+#   -i				normalise all characters to lower case
+#	-d 				normalise diacritics
+#	-p <file>		read predictions from file						
+#	-o <file>		write statistics to file, default is to stdout
 
 my $fh;
 if ($opt_o)
@@ -63,20 +70,11 @@ while (<$ifh>)
 		my $word   = $3;
 		my $output = $4;
 
-		if ($opt_i)
+		unless ( normalise($word, $opt_i, $opt_d) eq normalise($output, $opt_i, $opt_d) )
 		{
-			unless ( uc($word) eq uc($output) )
-			{
-				$tagError{$tag} += 1;
-			}
+			$tagError{$tag} += 1;
 		}
-		else
-		{
-			unless ( $word eq $output )
-			{
-				$tagError{$tag} += 1;
-			}
-		}
+
 		$tagTotal{$tag} += 1;
 	}
 }
