@@ -1,3 +1,56 @@
+Create lexicon files
+==============
+
+The script can currently handle both the eLex lexicon file and the Lassy corpus files of which can generate a lexicon.
+
+The options are:
+
+    destrafodu-createlexicon.pl
+    
+    #	-e <file|->		eLex XML file
+    
+    #	-p <file|->		persistent lexicon file
+    
+    #	-l <file|->		Lassy frequency counts file
+    #	-L <dir>		Lassy XML directory, currently not implemented
+    
+    #	-o <file|->		writes output to file, default is to stdout
+    #	-m <file>		writes the lexicon entries with their relative mass to a file
+    
+    #	-w <n>			weighting scheme, n = {1,2,3}, default = 2
+    #	-t <n>			repetition scheme, n = {1,2,3}, default = 1 (type, token, masstoken)    
+    #	-M <n>			number of entries per tag-lemma pair for masstoken, default = 10
+
+    #	-d 				normalise diacritics
+    #   -i				normalise all characters to lower case
+
+You have to specify either -e, -p, -l, or -L, as the program must have an input. The default
+output is to STDOUT, but this can be redirected using -o.
+    
+The weighting scheme has three options:
+
+    w1: do nothing
+    w2: +1 to every triple
+    w3: 0 -> 2, 1 -> 1, +1 to other frequencies
+    
+w1 will use the eLex frequencies as is. w2 uses also the zero-valued triples in eLex. These
+are triples that were in earlier lexicons, but were not observed in the corpora on which eLex
+is based. w3 prefers unobserved triples over triples that were only observed once. The idea is
+that triples that were only observed once are more likely to be errors, whereas unobserved 
+triples are just, ... unobserved.
+
+For the repetition scheme there are also three values. t1 returns all the unique triples. 
+t2 returns all the triples, each triple occurs as often as their frequency indicates. If t3 is
+enabled the triples occur proportional to their relative mass. For each tag-lemma-form triple we
+determine how often it occurs with respect to its tag-lemma pair. We convert this to a relative
+frequency, and output the triple as often as this frequency indicates. The amount of "proportional
+slots" can be adjusted with -M.
+
+For normalisation we currently use two methods. -d enables the diacritics normalisation. Letters with
+accents or other diacritic signs are mapped to their "base" letter: ë -> e, ï -> i, ê -> e, ç -> c, etc.
+The second method is case normalisation (-i). All characters are mapped to their lower case equivalent.
+In case both options are used, first the diacritics are removed, then the characters are mapped to lower case.
+
 Lexicon-based delemmatisation
 ==============
 
@@ -55,7 +108,7 @@ Compare these results to the case-sensitive analysis, and as expected there is a
 
     perl destrafodu-lex.pl -m/tmp/destrafodu/eLex.w2.t3.rm -i/tmp/destrafodu/Lassy.w1.t2.lexicon | perl destrafodu-analysis.pl
 
- 
+Now the results are slightly different:
 
     Overall performance:
     	N: 0.818320 (201927/246758)
