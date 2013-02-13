@@ -1,9 +1,9 @@
-sub generateDumbTypes
+sub generateTypes
 {
 	my $lexiconRef = shift;
 	my @lexicon = @$lexiconRef;
-	
-	my @tokenLexicon;
+
+	my %hash;
 	
 	for(my $i = 0; $i < $#lexicon; )
 	{
@@ -13,10 +13,20 @@ sub generateDumbTypes
 		my $frequency = $lexicon[$i++];
 		my $mass = $lexicon[$i++];
 		
-		push(@tokenLexicon, ($tag, $lemma, $form));
+		$hash{"$tag $lemma $form"}++;
 	}
 	
-	return @tokenLexicon;
+	my @unique;
+	
+	foreach(keys %hash)
+	{
+		if($_ =~ m/^([^ ]+) ([^ ]+) ([^ ]+)$/g)
+		{
+			push(@unique, ($1, $2, $3));
+		}
+	}
+
+	return @unique;
 }
 
 sub generateTokens
@@ -34,6 +44,11 @@ sub generateTokens
 		my $frequency = $lexicon[$i++];
 		my $mass = $lexicon[$i++];
 		
+		if($frequency == 0)
+		{
+			print STDERR ">>> freq0: $tag $lemma $form\n";
+		}
+		
 		for(1..$frequency)
 		{
 			push(@tokenLexicon, ($tag, $lemma, $form));
@@ -46,6 +61,9 @@ sub generateTokens
 sub generateMassTokens
 {
 	my $lexiconRef = shift;
+	my $tlfSize = shift;
+	
+	
 	my @lexicon = @$lexiconRef;
 	
 	my @tokenLexicon;
@@ -58,7 +76,7 @@ sub generateMassTokens
 		my $frequency = $lexicon[$i++];
 		my $mass = $lexicon[$i++];
 		
-		my $rounded = int((10*$mass) + 0.5);
+		my $rounded = int(($tlfSize*$mass) + 0.5);
 		
 		for(1..$rounded)
 		{

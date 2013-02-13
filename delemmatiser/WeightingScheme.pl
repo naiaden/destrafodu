@@ -4,12 +4,14 @@ use Switch;
 sub applyScheme1($)
 {
 	my $frequency = shift;
+	
 	return $frequency;
 }
 
 sub applyScheme2($)
 {
 	my $frequency = shift;
+	
 	return $frequency+1;
 }
 
@@ -27,14 +29,13 @@ sub applyScheme3($)
 	}
 
 	return $frequency+1; 
-
-	
 }
 
 sub applyWeighting($$)
 {
 	my $weightingScheme = shift;
 	my $tlffCombinationsRef = shift;
+	
 	my @tlffCombinations = @$tlffCombinationsRef;
 	
 	my %tlFrequencies = ();
@@ -44,14 +45,10 @@ sub applyWeighting($$)
 	{
 		my $line = $_;
 		
-		#my ($tag, $lemma, $form, $frequency) = ($line);
-		
 		$tag = $tlffCombinations[$itr++];
 		$lemma = $tlffCombinations[$itr++];
 		$form = $tlffCombinations[$itr++];
 		$frequency = $tlffCombinations[$itr++];
-		
-		#print ">$tag $lemma $form $frequency\n";
 		
 		if(exists($tlfFrequencies{"$tag $lemma $form"}))
 		{
@@ -63,9 +60,6 @@ sub applyWeighting($$)
 
 	}
 	
-	print "\n";
-	
-	
 	foreach my $tlfFrequency (keys %tlfFrequencies)
 	{
 		my $frequency = $tlfFrequencies{$tlfFrequency};
@@ -74,15 +68,15 @@ sub applyWeighting($$)
 		{
 			case 1
 			{
-				applyScheme1($frequency);
+				$tlfFrequencies{$tlfFrequency} = applyScheme1($frequency);
 			}
 			case 2
 			{
-				applyScheme2($frequency);
+				$tlfFrequencies{$tlfFrequency} = applyScheme2($frequency);
 			}
 			case 3
 			{
-				applyScheme3($frequency);
+				$tlfFrequencies{$tlfFrequency} = applyScheme3($frequency);
 			}  
 			else
 			{
@@ -133,7 +127,6 @@ sub applyWeighting($$)
 		}
 	
 		push(@tlffmCombinations, ($tag, $lemma, $form, $frequency, $tlfRelMass));
-		#print("$tag, $lemma, $form, $frequency, $tlfRelMass\n");
 	}
 	
 	return @tlffmCombinations;

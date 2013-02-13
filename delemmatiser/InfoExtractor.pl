@@ -1,12 +1,45 @@
 use Acme::Comment type => 'C++';
 use HTML::Entities;
 use File::Find::Rule ;
+use Unicode::Normalize;
 use Encode;
+
+require 'TagConverter.pl';
 
 binmode STDIN, ":utf8";
 
 our $lassyTagRegex = qr/^\s*<node.*?lemma=\"(.*?)\".*?postag=\"(.*?)\".*?word=\"(.*?)\".*?\/>$/;
 our $elexTagRegex = qr/<pos>([^<]+)<\/pos>/;
+
+
+
+
+ 
+sub normalise($$$)
+{
+ my $str = shift;
+ my $normaliseDiacritics = shift;
+ my $normaliseCase = shift;
+ 
+ if($normaliseDiacritics)
+	{
+ 
+		 for ( $str ) {  # the variable we work on
+		   $_ = NFD( $_ );   ##  decompose
+		   s/\pM//g;         ##  strip combining characters
+		   s/[^\0-\x80]//g;  ##  clear everything else
+		 }
+		 
+		 
+	}
+	
+	if($normaliseCase)
+	{
+		$str = lc($str);
+	}
+	return $str;
+}
+
 
 sub extractLassyXMLDirectory($)
 {
@@ -122,27 +155,25 @@ sub extractLassyCountFileStdIn ()
 
 sub extractLassyCountFile ($)
 {
-	my $lassyCountFile = shift;
+	my $fh = shift;
+	my $normaliseDiacritics = shift;
+	my $normaliseCase = shift;
 	
 	my @tlfCombinations;
-	
-	open IF, "$lassyCountFile" or die "Cannot open lassy count input file $lassyCountFile!\n";
-	
-	binmode IF, "utf8";
 	
 	my $lemma;
 	my $form;
 	my $tag;
 	
-	while(<IF>)
+	while(<$fh>)
 	{
 		my $line = $_;
 		
 		if($line =~ m/\s+(\d+) ([^ ]+) ([^ ]+) ([^ ]+)$/g)
 		{
 			my $frequency = $1;
-			$lemma = $3;
-			$form = $2;
+			$lemma = normalise($3, $normaliseDiacritics, $normaliseCase);
+			$form = normalise($2, $normaliseDiacritics, $normaliseCase);
 			$tag = $4;
 			
 			my $convertedTag = convertTag($tag);
@@ -158,14 +189,14 @@ sub extractLassyCountFile ($)
 		} 
 	}
 	
-	close IF;
-	
 	return @tlfCombinations;
 }
 
-sub extractElexXMLFile ($)
+sub extractElexXMLFile ($$$)
 {
-	my $elexXMLFile = shift;
+	my $fh = shift;
+	my $normaliseDiacritics = shift;
+	my $normaliseCase = shift;
 	
 	my @tlffCombinations;
 	
@@ -176,79 +207,16 @@ sub extractElexXMLFile ($)
 	
 	my $i = 0;
 	
-	open IF, '<:encoding(latin1)', "$elexXMLFile" or die "Cannot open elex input file $elexXMLFile!\n";
-	
-	while(<IF>)
-	{
-		if($i++ % 100 == 0)
-		{
-			#print "$i ";
-			
-			if($i % 5000 == 0)
-			{
-				#print "\n";
-			}
-		}
-		
+	while(<$fh>)
+	{	
 		my $line = $_;
 		
 		if($line =~ m/<lem>([^,]+)(,.*?)?<\/lem>/g)
 		{
-			$lemma = decode_entities($1);
+			$lemma = normalise(decode_entities($1), $normaliseDiacritics, $normaliseCase);
 		} elsif($line =~ m/<orth>([^<]+)<\/orth>/g)
 		{
-			$form = decode_entities($1);
-		} elsif($line =~ m/<pos>([^<]+)<\/pos>/g)
-		{
-			$tag = convertTag($1);
-		} elsif($line =~ m/<freq>([^<]+)<\/freq>/g)
-		{
-			$freq = $1;
-		} elsif($line =~ m/<\/wordf>/g)
-		{					
-			if($tag ne 0)
-			{
-				push(@tlffCombinations, ($tag, $lemma, $form, $freq));
-			}
-		}
-	}
-	
-	close IF;
-	
-	return @tlffCombinations;
-}
-
-sub extractElexXMLFileStdIn ()
-{
-	my @tlffCombinations;
-	
-	my $lemma;
-	my $form;
-	my $freq;
-	my $tag;
-	
-	my $i = 0;
-	
-	while(<>)
-	{
-		if($i++ % 100 == 0)
-		{
-			#print "$i ";
-			
-			if($i % 5000 == 0)
-			{
-				#print "\n";
-			}
-		}
-		
-		my $line = $_;
-		
-		if($line =~ m/<lem>([^,]+)(,.*?)?<\/lem>/g)
-		{
-			$lemma = decode_entities($1);
-		} elsif($line =~ m/<orth>([^<]+)<\/orth>/g)
-		{
-			$form = decode_entities($1);
+			$form = normalise(decode_entities($1), $normaliseDiacritics, $normaliseCase);
 		} elsif($line =~ m/<pos>([^<]+)<\/pos>/g)
 		{
 			$tag = convertTag($1);
