@@ -78,6 +78,30 @@ not necessary, and the default value performs well enough in general.
 Lexicon-based delemmatisation
 ==============
 
+Strategy
+--------------
+
+The idea is simple, if the tag-lemma triple occurs in the lexicon, we do a lookup in the lexicon to find the corresponding form.
+If it does not occur in the lexicon, we can do two things. Either we return a result that we don't know the form ("?"), or we 
+return the lemma. The latter case is the best guess we can do given the circumstances.
+
+If there are multiple surface forms that correspond to one tag-lemma pair, we take the surface form with the maximum likelihood,
+the one that occurs most. Or if multiple forms occur as many times (4 same forms with a flat distribution: i.e. 25% of the time)
+we randomly take one of those.
+
+This means that if you want to steer the results in favour of preferring dialect, for example, you have to boost the frequency of dialect words.
+We don't have facilities for that, but the input is plain text and easy to process.
+
+The script to perform lexicon-based delemmatisation has the following options:
+
+    destrafodu-lex.pl
+    
+    #	-m <file>		reads rel.mass lexicon file
+    #	-i <file|->		reads the input
+    #	-o <file|->		writes tag-lemma-form-prediction quadruples to file, default is to stdout
+    
+    #	-l				returns lemma if tag-lemma not in lexicon 
+
 Early normalisation
 --------------
 If you want to train on eLex with relative frequency scaling and case normalisation and use the non-seen triples as well:
