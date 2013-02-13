@@ -3,11 +3,13 @@ use Acme::Comment type => 'C++';
 use Getopt::Std;
 
 use strict;
+
 #use warnings;
 
 binmode STDOUT, ":utf8";
 
-use vars qw( $opt_e $opt_o $opt_p $opt_w $opt_t $opt_m $opt_M $opt_d $opt_i $opt_l $opt_L $opt_P);
+use vars
+  qw( $opt_e $opt_o $opt_p $opt_w $opt_t $opt_m $opt_M $opt_d $opt_i $opt_l $opt_L $opt_P);
 
 require 'InfoExtractor.pl';
 require 'LexiconActions.pl';
@@ -42,100 +44,97 @@ our @trainData;
 #	-d 				normalise diacritics
 #   -i				normalise all characters to lower case
 
-getopts( 'e:o:p:w:t:m:M:dil:P:L:' );
-
+getopts('e:o:p:w:t:m:M:dil:P:L:');
 
 if ($opt_e)
 {
+
 	#print "Reading eLex XML file... ";
-	
-	@trainData = readeLexXMLFile($opt_e, $opt_d, $opt_i);
+
+	@trainData = readeLexXMLFile( $opt_e, $opt_d, $opt_i );
 
 	#print "Number of entries read: ".(($#trainData+1)/4)."\n";
-} elsif ($opt_p)
+}
+elsif ($opt_p)
 {
+
 	#print "Reading persistent lexicon file... ";
-	
-	@trainData = readPersistenteLexFile($opt_p, $opt_d, $opt_i);
-	
+
+	@trainData = readPersistenteLexFile( $opt_p, $opt_d, $opt_i );
+
 	#print "Number of entries read: ".(($#trainData+1)/4)."\n";
-} elsif ($opt_l)
+}
+elsif ($opt_l)
 {
+
 	#print "Reading Lassy counts file... ";
-	
-	@trainData = readLassyCountFile($opt_l, $opt_d, $opt_i);
-	
+
+	@trainData = readLassyCountFile( $opt_l, $opt_d, $opt_i );
+
 	#print "Number of entries read: ".(($#trainData+1)/3)."\n";
-} elsif( $opt_d )
+}
+elsif ($opt_d)
 {
+
 	#print "Reading Lassy XML directory... ";
 	#@testData = extractLassyXMLDirectory($opt_d);
-	
-	die ("Reading a Lassy XML directory is currently not implemented.\nUse the count file.\n");
-	
+
+	die(   "Reading a Lassy XML directory is currently not implemented.\nUse the count file.\n"
+	);
+
 	#print "Number of entries read: ".(($#testData+1)/3)."\n";
 }
 
-
 else
 {
-	die ("Cannot create a lexicon without input data!\n");
+	die("Cannot create a lexicon without input data!\n");
 }
 
+my @trainTypeData = applyWeighting( $opt_w, \@trainData );
 
-
-
-
-my @trainTypeData = applyWeighting($opt_w, \@trainData);
 #print "Number of entries after appyling weight: ".(($#trainTypeData+1)/5)."\n";
 
-if($opt_m)
+if ($opt_m)
 {
 	my $fh;
-	open($fh, '>', $opt_m) or die;
+	open( $fh, '>', $opt_m ) or die;
 	binmode $fh, ":utf8";
-	
-	writeWeightedTrainLexicon($fh, \@trainTypeData);
+
+	writeWeightedTrainLexicon( $fh, \@trainTypeData );
 }
-
-
-
-
-
-
-
 
 my @trainOutputData;
-if ($opt_t eq 1)
+if ( $opt_t eq 1 )
 {
-	@trainOutputData = generateTypes(\@trainTypeData);
-	
+	@trainOutputData = generateTypes( \@trainTypeData );
+
 }
-elsif( $opt_t eq 2)
+elsif ( $opt_t eq 2 )
 {
-	@trainOutputData = generateTokens(\@trainTypeData);
+	@trainOutputData = generateTokens( \@trainTypeData );
 }
-elsif( $opt_t eq 3)
+elsif ( $opt_t eq 3 )
 {
-	@trainOutputData = generateMassTokens(\@trainTypeData, $opt_M);
+	@trainOutputData = generateMassTokens( \@trainTypeData, $opt_M );
 }
 
-
-
-if( $opt_o )
+if ($opt_o)
 {
-	
+
 	my $fh;
-	if ($opt_o ne "-") {
-	   open($fh, '>', $opt_o) or die;
-	} else {
-	   $fh = \*STDOUT;
+	if ( $opt_o ne "-" )
+	{
+		open( $fh, '>', $opt_o ) or die;
+	}
+	else
+	{
+		$fh = \*STDOUT;
 	}
 	binmode $fh, ":utf8";
-	
-	
-	writeLexicon($fh, \@trainOutputData);
-} else
+
+	writeLexicon( $fh, \@trainOutputData );
+}
+else
 {
-	writeLexicon(\*STDOUT, \@trainOutputData);
+	writeLexicon( \*STDOUT, \@trainOutputData );
 }

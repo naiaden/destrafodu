@@ -134,6 +134,9 @@ sub whereDiffer
 sub startsWithParticle
 {
 	my $word = shift;
+	my $DLParticlesRef = shift;
+	
+	my @DLParticles = @$DLParticlesRef;
 	
 	# For now we take the longest particle possible
 	my @fittingParticles;
@@ -175,7 +178,6 @@ sub readParticle($)
 			push(@particles, $1);
 		}
 	}
-	sort(@particles);
 	close FILE;
 	
 	return @particles;

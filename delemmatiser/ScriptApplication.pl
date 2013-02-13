@@ -10,13 +10,13 @@ sub applyExtDifff
 	my $word = shift;
 	my $diff = shift;
 
-	if($diff =~ m/^-([^\.]*)\.([^\s]*) \+([^\.]*)\.([^\s]*)/)
-	{	
-		my $sub = substr($word, length($1), length($word));
-		return $3.substr($sub, 0, length($sub)-length($2)).$4;
+	if ( $diff =~ m/^-([^\.]*)\.([^\s]*) \+([^\.]*)\.([^\s]*)/ )
+	{
+		my $sub = substr( $word, length($1), length($word) );
+		return $3 . substr( $sub, 0, length($sub) - length($2) ) . $4;
 	}
-	
-	warn("Trying to apply unvalid diff ($diff) on word ($word)\n"); 
+
+	warn("Trying to apply unvalid diff ($diff) on word ($word)\n");
 	return undef;
 }
 
