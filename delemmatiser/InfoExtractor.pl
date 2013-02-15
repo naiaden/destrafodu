@@ -19,6 +19,8 @@ sub normalise($$$)
 	my $normaliseDiacritics = shift;
 	my $normaliseCase       = shift;
 
+	$str =~ s/,/_/g;
+
 	if ($normaliseDiacritics)
 	{
 		for ($str)

@@ -352,4 +352,42 @@ For which it gives the result:
     
 Which seems about right :)
 
+Current results
+==============
 
+For commit 7bcdfcb546720bd20f3ba06cf7ad78cf98c1177c
+
+LEXu
+--------------
+
+    eLex types/masstokens on Lassy types (-, i, d, di)
+    	N: 52.42 59.78 53.45 60.96
+    	V: 86.54 93.15 88.25 95.06
+    	A: 66.56 78.44 67.58 79.70
+    
+    eLex types/masstokens on Lassy tokens (-, i, d, di)
+    	N: 80.50 87.18 81.91 88.66
+    	V: 96.40 98.20 97.08 98.89
+    	A: 88.44 95.21 89.56 96.41
+
+LEXl
+--------------    
+
+    eLex types/masstokens on Lassy types, lemma (-, i, d, di)
+    	N: 77.97 88.37 78.24 88.70
+    	V: 87.50 94.18 88.93 95.79
+    	A: 71.93 84.88 72.66 85.79
+
+    eLex types/masstokens on Lassy tokens, lemma (-, i, d, di)
+    	N: 89.82 96.79 90.11 97.09
+    	V: 96.56 98.37 97.14 98.96
+    	A: 89.37 96.17 90.39 97.26
+    	
+ML
+--------------    	
+
+soon...
+
+MLw
+-------------- 
+    	
