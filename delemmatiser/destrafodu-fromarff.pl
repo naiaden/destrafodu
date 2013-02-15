@@ -5,7 +5,7 @@ use Getopt::Std;
 use strict;
 
 require 'ScriptApplication.pl';
-require 'FeatureFunctionss.pl';
+require 'FeatureFunctions.pl';
 
 binmode STDOUT, ":utf8";
 binmode STDIN,  ":utf8";
