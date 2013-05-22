@@ -73,7 +73,7 @@ elsif ($opt_l)
 
 	#print "Number of entries read: ".(($#trainData+1)/3)."\n";
 }
-elsif ($opt_d)
+elsif ($opt_L)
 {
 
 	#print "Reading Lassy XML directory... ";

@@ -9,7 +9,8 @@ require 'LexiconActions.pl';
 require 'PersistenceFactory.pl';
 require 'TagConverter.pl';
 require 'WeightingScheme.pl';
-require 'arffthings.pl';
+require 'FeatureFunctions.pl';
+require 'ScriptApplication.pl';
 
 
 binmode STDOUT, ":utf8";
@@ -17,13 +18,19 @@ binmode STDIN, ":utf8";
 
 $|++;
 
-use vars qw( $opt_m $opt_p $opt_t $opt_P $opt_b $opt_i $opt_o $opt_h);
+use vars qw( $opt_m $opt_p $opt_t $opt_P $opt_b $opt_i $opt_o $opt_h $opt_x $opt_s);
 
 #	-h <host>			host name or address on which the timblserver runs
 #	-P <n>				port number on which the timblserver runs, default=7000
 #	-t <timblclient>	the timblclient, default it is timblclient (from PATH)
 #	-b <name>			base name, default=destrafodu
 
+#  -x                only apply the edit script if possible, returns "???" if
+#                    the script cannot be applied. Default setting is to force
+#                    the application of the edit script.
+#   -s               max suffix length, default=35
+
+#  -p <file>         particles file
 #	-m <file>			reads rel.mass lexicon file
 
 #	-i <file|->			input of tag-lemma-form triples, form can be ? in case it is unknown, default is from stdin
@@ -37,11 +44,11 @@ $opt_t = "timblclient";
 $opt_P = "7000";
 $opt_b = "destrafodu";
 
-getopts('m:p:t:P:b:i:o:h:');
+getopts('m:p:t:P:b:i:o:h:xs:');
 
 unless($opt_h)
 {
-	die ("You might give up a hostname which runs the timblserver!\n");
+	die ("You must give up a hostname which runs the timblserver!\n");
 }
 
 if( $opt_m )
@@ -51,7 +58,7 @@ if( $opt_m )
 
 if( $opt_p )
 {
-	readParticle($opt_p);
+	@DLParticles = readParticle($opt_p);
 }
 
 my $fh;
@@ -83,7 +90,10 @@ if ($opt_i) {
 }
 binmode $ifh, ":utf8";
 
-
+if ($opt_s)
+{
+	$maxSuffixLength = $opt_s;
+}
 
 
 my $pid = open3(\*CHLD_IN, \*CHLD_OUT, \*CHLD_ERR, "$opt_t -n $opt_h -p $opt_P")
@@ -92,6 +102,8 @@ my $pid = open3(\*CHLD_IN, \*CHLD_OUT, \*CHLD_ERR, "$opt_t -n $opt_h -p $opt_P")
 my $serverResponse;
 
 print CHLD_IN "base $opt_b\n";
+binmode CHLD_IN, ":utf8";
+binmode CHLD_OUT, ":utf8";
 
 while(<$ifh>)
 {
@@ -137,7 +149,16 @@ while(<$ifh>)
 					my $diff = $1;
 					$diff =~ s/\\_/ /g;
 					$diff =~ s/"//g;
-					$prediction = applyExtDifff($lemma, $diff);
+					
+					if($opt_x)
+					{
+						$prediction = applyExtDifffIfPossible($lemma, $diff);
+					}
+					else
+					{
+						$prediction = applyExtDifff($lemma, $diff);
+					}
+					
 					last;
 				}
 			}

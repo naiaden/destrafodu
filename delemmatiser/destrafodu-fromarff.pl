@@ -11,10 +11,15 @@ binmode STDOUT, ":utf8";
 binmode STDIN,  ":utf8";
 
 #   -i <file|->     reads input from file, default is from stdin
+
+#   -x              only apply the edit script if possible, returns "???" if
+#                   the script cannot be applied. Default setting is to force
+#                   the application of the edit script.
+
 #   -o <file|->     writes output to file, default is to stdout
 
-use vars qw( $opt_o $opt_i );
-getopts('o:i:');
+use vars qw( $opt_o $opt_i $opt_x );
+getopts('o:i:x');
 
 my $fh;
 if ($opt_o)
@@ -62,8 +67,19 @@ while (<$ifh>)
 		my $diff1 = $3;
 		my $diff2 = $4;
 
-		my $word1 = applyExtDifff( $w, $diff1 );
-		my $word2 = applyExtDifff( $w, $diff2 );
+		my $word1 = "???";
+		my $word2 = "???";
+
+		if ($opt_x)
+		{
+			$word1 = applyExtDifffIfPossible( $w, $diff1 );
+			$word2 = applyExtDifffIfPossible( $w, $diff2 );
+		} 
+		else
+		{
+			$word1 = applyExtDifff( $w, $diff1 );
+			$word2 = applyExtDifff( $w, $diff2 );
+		}
 
 		print $fh "$1 $w $word1 $word2\n";
 	}

@@ -12,7 +12,7 @@ require 'FeatureFunctions.pl';
 binmode STDOUT, ":utf8";
 binmode STDIN,  ":utf8";
 
-#   -p              particles file
+#   -p <file>       particles file
 
 #   -s              max suffix length, default=35
 
@@ -27,7 +27,7 @@ my $maxSuffixLength = 35;
 
 if ($opt_p)
 {
-	readParticle($opt_p);
+	@DLParticles = readParticle($opt_p);
 }
 
 if ($opt_s)
