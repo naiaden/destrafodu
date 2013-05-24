@@ -16,10 +16,12 @@ binmode STDIN,  ":utf8";
 #                   the script cannot be applied. Default setting is to force
 #                   the application of the edit script.
 
+#   -d              debug, also prints the scripts. Do not use in the pipeline!
+
 #   -o <file|->     writes output to file, default is to stdout
 
-use vars qw( $opt_o $opt_i $opt_x );
-getopts('o:i:x');
+use vars qw( $opt_o $opt_i $opt_x $opt_d );
+getopts('o:i:xd');
 
 my $fh;
 if ($opt_o)
@@ -81,7 +83,14 @@ while (<$ifh>)
 			$word2 = applyExtDifff( $w, $diff2 );
 		}
 
-		print $fh "$1 $w $word1 $word2\n";
+		if($opt_d)
+		{
+			print $fh "$1 $w $word1 $word2 $diff1 $diff2\n";
+		}
+		else
+		{
+			print $fh "$1 $w $word1 $word2\n";
+		}
 	}
 }
 
