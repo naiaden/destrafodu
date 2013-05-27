@@ -15,15 +15,17 @@ binmode STDIN,  ":utf8";
 #   -p <file>       particles file
 
 #   -s              max suffix length, default=35
+#   -f              fill to suffix length with empty values
 
 #   -i <file|->     reads input from file, default is from stdin
 #   -o <file|->     writes output to file, default is to stdout
 
-use vars qw( $opt_p $opt_s $opt_o $opt_i );
-getopts('p:s:o:i:');
+use vars qw( $opt_p $opt_s $opt_o $opt_i $opt_f );
+getopts('p:s:o:i:f:');
 
 my @DLParticles;
 my $maxSuffixLength = 35;
+my $suffixFeaturePositions = $maxSuffixLength;
 
 if ($opt_p)
 {
@@ -33,6 +35,11 @@ if ($opt_p)
 if ($opt_s)
 {
 	$maxSuffixLength = $opt_s;
+}
+
+if ($opt_f)
+{
+	$suffixFeaturePositions = $opt_f;
 }
 
 my $fh;
@@ -79,7 +86,7 @@ print $fh "% 1. Title: destrafodu\n" . "%\n"
   . "\@ATTRIBUTE tag		string\n"
   . "\@ATTRIBUTE prefix	string\n"
   . "\@ATTRIBUTE capital	{1,0}\n";
-foreach my $attrItr ( 1 .. $maxSuffixLength )
+foreach my $attrItr ( 1 .. $suffixFeaturePositions )
 {
 	print $fh "\@ATTRIBUTE c$attrItr\t\tstring\n";
 }
@@ -105,6 +112,12 @@ while (<$ifh>)
 		{
 			print $fh "," . ( $itr ne "" ? "\"" . $itr . "\"" : "?" );
 		}
+		
+		for (my $itr = $maxSuffixLength; $itr < $suffixFeaturePositions; ++$itr)
+		{
+			print $fh ",?";
+		}
+		
 		print $fh ",\"$diff\"\n";
 	}
 
@@ -129,6 +142,10 @@ while (<$ifh>)
 		{
 			print $fh "," . ( $itr ne "" ? "\"" . $itr . "\"" : "?" );
 		}
+		for (my $itr = $maxSuffixLength; $itr < $suffixFeaturePositions; ++$itr)
+		{
+			print $fh ",?";
+		}
 		print $fh ",\"$diff\"\n";
 	}
 
@@ -148,6 +165,10 @@ while (<$ifh>)
 		foreach my $itr ( suffices( $word, $maxSuffixLength ) )
 		{
 			print $fh "," . ( $itr ne "" ? "\"" . $itr . "\"" : "?" );
+		}
+		for (my $itr = $maxSuffixLength; $itr < $suffixFeaturePositions; ++$itr)
+		{
+			print $fh ",?";
 		}
 		print $fh ",\"$diff\"\n";
 	}
