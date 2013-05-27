@@ -9,6 +9,22 @@ test=Lassy.w1.t1.di
 
 maxrange=40
 
+for i in $(seq $maxrange)
+do
+	echo Preparing suffix experiment for suffix length $i
+	echo -ne train...
+	perl destrafodu-toarff.pl -s $i -f $maxrange -p/home/louis/p1/delemmatiser/data/particles.txt -igenerated/$train.lexicon -ogenerated/suffix/$train-$i-$maxrange.arff
+	echo done!
+	
+	echo -ne test
+	perl destrafodu-toarff.pl -s $i -f $maxrange -p/home/louis/p1/delemmatiser/data/particles.txt -igenerated/$test.lexicon -ogenerated/suffix/$test-$i-$maxrange.arff
+	echo done!
+	
+	timbl -a 1 -f generated/suffix/$train-$i-$maxrange.arff -t generated/suffix/$test-$i-$maxrange.arff -F ARFF -o results/suffix/$train-$test-$i-$maxrange.predictions
+
+	perl destrafodu-fromarff-ext.pl -tgenerated/$test.lexicon -iresults/suffix/$train-$test-$i-$maxrange.predictions | perl destrafodu-analysis.pl 
+
+done
 
 for i in $(seq $maxrange)
 do
