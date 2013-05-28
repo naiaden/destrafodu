@@ -20,12 +20,3 @@ do
 	done
 done
 
-for i in ${eLex[@]}
-do
-   for j in ${Lassy[@]}
-	do
-	echo Machine learning-based experiment with $i and $j
-		perl destrafodu-fromarff.pl -x -iresults/ml/ml.$i-$j.predictions | perl destrafodu-analysis.pl -oresults/ml/ml.$i-$j.performance
-		grep "[NAV]:" results/ml/ml.$i-$j.performance | sed 's/^[ \t]*//' | sed 's/(\(.*\))$//' | sed -e :a -e '$!N; s/\n/ /; ta'
-	done
-done
